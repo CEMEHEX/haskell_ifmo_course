@@ -1,0 +1,13 @@
+resolver: lts-9.4
+
+packages:
+- hw1
+- hw2
+- hw3
+- bonus
+
+extra-deps: []
+
+flags: {}
+
+extra-package-dbs: []

@@ -1,0 +1,71 @@
+{-# LANGUAGE TupleSections #-}
+
+module Parsec.Parser where
+
+import           Control.Applicative (Alternative, empty, (<|>))
+import           Control.Monad       ((>=>))
+import           Data.Char           (isAlpha, isAlphaNum, isDigit, isSpace,
+                                      isUpper)
+
+newtype Parser a = Parser { runParser :: String -> Maybe (a, String) }
+
+-- Instances -------------------------------------------------------------------
+instance Functor Parser where
+    fmap f p = Parser $ fmap (first f) . runParser p
+        where
+            first :: (a -> c) -> (a, b) -> (c, b)
+            first g (a, b) = (g a, b)
+
+instance Applicative Parser where
+    pure a = Parser $ Just . (a,)
+
+    (Parser pf) <*> (Parser pv) = Parser $
+        pf    >=> \(f, s') ->
+        pv s' >>= \(v, s'') ->
+        return (f v, s'')
+
+instance Alternative Parser where
+    empty = Parser $ const Nothing
+
+    (Parser p1) <|> (Parser p2) = Parser $ \s -> p1 s <|> p2 s
+
+-- Functions ------------------------------------------------------------------
+zeroOrMore :: Parser a -> Parser [a]
+zeroOrMore p = (:) <$> p <*> zeroOrMore p <|> pure []
+
+oneOrMore :: Parser a -> Parser [a]
+oneOrMore p = (:) <$> p <*> zeroOrMore p
+
+satisfy :: (Char -> Bool) -> Parser Char
+satisfy p = Parser f
+    where
+        f []            = Nothing
+        f (x:xs)
+            | p x       = Just (x, xs)
+            | otherwise = Nothing
+
+posInt :: Parser Integer
+posInt = Parser f
+    where
+        f xs
+            | null ns            = Nothing
+            | otherwise          = Just (read ns, rest)
+                where (ns, rest) = span isDigit xs
+
+char :: Char -> Parser Char
+char c = satisfy (== c)
+
+upper :: Parser Char
+upper = satisfy isUpper
+
+space :: Parser Char
+space = satisfy isSpace
+
+ignored :: Parser a -> Parser ()
+ignored = (*> pure ())
+
+spaces :: Parser String
+spaces = zeroOrMore space
+
+ident :: Parser String
+ident = (:) <$> satisfy isAlpha <*> zeroOrMore (satisfy isAlphaNum)
