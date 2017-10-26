@@ -1,18 +1,29 @@
 module NondeterminismSpec where
 
-import           Test.Hspec
-import           Test.Hspec.QuickCheck
-import           Test.QuickCheck
+import           Test.Hspec                  (Spec, describe, it, shouldBe)
+import           Test.Hspec.QuickCheck       (prop)
+import           Test.QuickCheck             (Property, choose, forAll)
 
-import           Nondeterminism.BinarySeq
-import           Nondeterminism.Combinations
-import           Nondeterminism.Permutations
+import           Nondeterminism.BinarySeq    (genBinSeq)
+import           Nondeterminism.Combinations (combinations)
+import           Nondeterminism.Permutations (permutations)
 
 spec :: Spec
 spec = do
+    it "Binary sequence simple tests" $ do
+        genBinSeq 0 `shouldBe` [[]]
+        genBinSeq 1 `shouldBe` [[0], [1]]
+        genBinSeq 2 `shouldBe` [[0, 0], [0, 1], [1, 0], [1, 1]]
+
     describe "BinarySeq" $ do
         prop "binary sequence count" binSeqCntProp
         prop "binary sequence combination" binSeqCombinationProp
+
+    it "Combinations simple tests" $ do
+        combinations 1 0 `shouldBe` [[]]
+        combinations 0 1 `shouldBe` []
+        combinations 3 3 `shouldBe` [[1, 2, 3]]
+        combinations 4 2 `shouldBe` [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
 
     describe "Combinations" $ do
         prop "combinations consistency" combConsistencyProp
@@ -20,6 +31,11 @@ spec = do
         prop "sum C_n^k = 2 ^ n" combSumProp
         prop "C_n^0 = C_n^n" combSimple1Prop
         prop "C_(n + 1)^k = C_n^(k - 1) + C_n^k" combSimple2Prop
+
+    it "Permutations simple tests" $ do
+        permutations ([] :: [()]) `shouldBe` [[]]
+        permutations [1,2,3] `shouldBe` [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+        permutations [[1,2,3], [4,5,6]] `shouldBe` [[[1,2,3], [4,5,6]],[[4,5,6],[1,2,3]]]
 
     describe "Permutations" $ do
         prop "permutations consistency" permConsistencyProp

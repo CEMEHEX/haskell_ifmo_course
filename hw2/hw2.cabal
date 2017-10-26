@@ -40,7 +40,7 @@ test-suite hw2-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  other-modules:       OptionalMonadsSpec, NondeterminismSpec
+  other-modules:       OptionalMonadsSpec, NondeterminismSpec, BaseTypeClassesSpec, ParserSpec
   build-depends:       base
                      , hw2
                      , hspec

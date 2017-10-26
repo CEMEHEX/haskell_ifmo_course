@@ -1,8 +1,8 @@
 module OptionalMonadsSpec where
 
-import           Test.Hspec
+import           Test.Hspec            (Spec, hspec, it, shouldBe)
 
-import           OptionalMonads.Arithm
+import           OptionalMonads.Arithm (ArithmeticError (..), Expr (..), eval)
 
 main :: IO ()
 main = hspec spec

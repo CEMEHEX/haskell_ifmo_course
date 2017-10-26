@@ -7,11 +7,11 @@ import           Parsec.Parser       (Parser, char, ident, oneOrMore, posInt,
 type Ident = String
 
 data Atom = N Integer | I Ident
-    deriving (Show)
+    deriving (Show, Eq)
 
 data SExpr = A Atom
            | Comb [SExpr]
-           deriving (Show)
+           deriving (Show, Eq)
 
 parseSExpr :: Parser SExpr
 parseSExpr = skipWS $ parseA <|> parseComb
@@ -29,4 +29,4 @@ parseA :: Parser SExpr
 parseA = A <$> parseAtom
 
 parseComb :: Parser SExpr
-parseComb = char '(' *> pure Comb <*> oneOrMore parseSExpr <* char ')'
+parseComb = char '(' *> skipWS (pure Comb) <*> oneOrMore parseSExpr <* skipWS (char ')')
