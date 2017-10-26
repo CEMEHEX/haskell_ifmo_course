@@ -1,4 +1,4 @@
-module Parsec.Part1 where
+module Parsec.Simple where
 
 import           Control.Applicative ((<|>))
 import           Parsec.Parser       (Parser, char, ignored, posInt, space,

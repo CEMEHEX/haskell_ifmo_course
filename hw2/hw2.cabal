@@ -24,7 +24,7 @@ library
                      , BaseTypeClasses.Fishes.MonadFish
                      , BaseTypeClasses.Fishes.MonadJoin
                      , BaseTypeClasses.ChaoticGood
-                     , Parsec.Parser, Parsec.Part1, Parsec.Part2, Parsec.Part3
+                     , Parsec.Parser, Parsec.Simple, Parsec.SExpr, Parsec.LetExpr
   ghc-options:         -Wall
   build-depends:       base >= 4.9 && < 5
   default-language:    Haskell2010

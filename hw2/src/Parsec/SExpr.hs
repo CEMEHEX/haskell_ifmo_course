@@ -1,8 +1,8 @@
-module Parsec.Part2 where
+module Parsec.SExpr where
 
 import           Control.Applicative ((<|>))
 import           Parsec.Parser       (Parser, char, ident, oneOrMore, posInt,
-                                      spaces)
+                                      skipWS)
 
 type Ident = String
 
@@ -14,7 +14,7 @@ data SExpr = A Atom
            deriving (Show)
 
 parseSExpr :: Parser SExpr
-parseSExpr = spaces *> (parseA <|> parseComb)
+parseSExpr = skipWS $ parseA <|> parseComb
 
 parseI :: Parser Atom
 parseI = I <$> ident

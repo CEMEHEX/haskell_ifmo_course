@@ -44,16 +44,17 @@ oneOrMore :: Parser a -> Parser [a]
 oneOrMore p = (:) <$> p <*> zeroOrMore p
 
 sepBy :: Parser a -> String -> Parser [a]
-sepBy p sep = spaces *> pure (:) <*> p <*> next
+sepBy p sep = skipWS $ pure (:) <*> p <*> next
     where
         next =
-            spaces *>
-            string sep *>
-            spaces *>
-            pure (:) <*>
+            skipWS (string sep) *>
+            skipWS (pure (:)) <*>
             p <*>
             next <|>
             pure []
+
+skipWS :: Parser a -> Parser a
+skipWS = (spaces *>)
 
 satisfy :: (Char -> Bool) -> Parser Char
 satisfy p = Parser f

@@ -1,8 +1,8 @@
-module Parsec.Part3 where
+module Parsec.LetExpr where
 
 import           Control.Applicative ((<|>))
 import           Parsec.Parser       (Parser, char, ident, oneOrMore, posInt,
-                                      sepBy, spaces, string)
+                                      sepBy, skipWS, string)
 
 type VarName = String
 
@@ -19,12 +19,9 @@ parseVar = Var <$> ident <|> Const <$> posInt
 
 parseLet :: Parser Let
 parseLet =
-    spaces >>
-    string "let" >>
-    spaces >>
-    ident >>= \x ->
-    spaces >>
-    char '=' >>
+    skipWS (string "let") >>
+    skipWS ident >>= \x ->
+    skipWS (char '=') >>
     (parseVar `sepBy` "+") >>= \xs ->
     return $ Let x xs
 
