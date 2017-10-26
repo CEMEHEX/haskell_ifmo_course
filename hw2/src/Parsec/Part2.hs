@@ -1,6 +1,8 @@
 module Parsec.Part2 where
 
-import           Parsec.Parser (Parser)
+import           Control.Applicative ((<|>))
+import           Parsec.Parser       (Parser, char, ident, oneOrMore, posInt,
+                                      spaces)
 
 type Ident = String
 
@@ -12,4 +14,19 @@ data SExpr = A Atom
            deriving (Show)
 
 parseSExpr :: Parser SExpr
-parseSExpr = undefined
+parseSExpr = spaces *> (parseA <|> parseComb)
+
+parseI :: Parser Atom
+parseI = I <$> ident
+
+parseN :: Parser Atom
+parseN = N <$> posInt
+
+parseAtom :: Parser Atom
+parseAtom = parseN <|> parseI
+
+parseA :: Parser SExpr
+parseA = A <$> parseAtom
+
+parseComb :: Parser SExpr
+parseComb = char '(' *> pure Comb <*> oneOrMore parseSExpr <* char ')'
