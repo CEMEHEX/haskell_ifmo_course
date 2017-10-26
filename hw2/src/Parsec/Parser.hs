@@ -29,12 +29,31 @@ instance Alternative Parser where
 
     (Parser p1) <|> (Parser p2) = Parser $ \s -> p1 s <|> p2 s
 
+instance Monad Parser where
+    -- :: Parser a -> (a -> Parser b) -> Parser b
+    (Parser p) >>= f = Parser $
+        p >=> \(a, s') ->
+        runParser (f a) s'
+
+
 -- Functions ------------------------------------------------------------------
 zeroOrMore :: Parser a -> Parser [a]
 zeroOrMore p = (:) <$> p <*> zeroOrMore p <|> pure []
 
 oneOrMore :: Parser a -> Parser [a]
 oneOrMore p = (:) <$> p <*> zeroOrMore p
+
+sepBy :: Parser a -> String -> Parser [a]
+sepBy p sep = spaces *> pure (:) <*> p <*> next
+    where
+        next =
+            spaces *>
+            string sep *>
+            spaces *>
+            pure (:) <*>
+            p <*>
+            next <|>
+            pure []
 
 satisfy :: (Char -> Bool) -> Parser Char
 satisfy p = Parser f
@@ -51,6 +70,10 @@ posInt = Parser f
             | null ns            = Nothing
             | otherwise          = Just (read ns, rest)
                 where (ns, rest) = span isDigit xs
+
+string :: String -> Parser String
+string ""     = pure ""
+string (c:cs) = (:) <$> char c <*> string cs
 
 char :: Char -> Parser Char
 char c = satisfy (== c)
