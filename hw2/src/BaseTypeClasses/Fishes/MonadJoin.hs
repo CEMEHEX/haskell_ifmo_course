@@ -51,13 +51,22 @@ instance (Functor m, MonadJoin m) => MonadFish m where
 -- PROOFS:
 
 -- 1) instance (Functor m, MonadJoin m) => Monad m
--- TODO
-{-  (m >>= f) >>= g ≡ m >>= (\x -> f x >>= g)
-    (m >>= f) >>= g === join $ fmap g (join $ fmap f m)           -- definition of >>=
 
+{-  m >>= return ≡ m
+   m >>= return === join (fmap return m)                        -- definition of >>=
+                === join (fmap returnJoin m)                    -- definition of return
+                === (join . fmap returnJoin) m                  -- assumption about (.)
+                === id m                                        -- second monadJoin law
+                === m                                           -- definition of id
 -}
 
 -- 2) instance (Functor m, MonadJoin m) => MonadFish m
--- TODO
-{-
+
+{- returnFish >=> f ≡ f
+    returnFish >=> f    === returnJoin >=> f                       -- definiiton of returnFish
+                        === \a -> join $ fmap returnJoin (f a)     -- definition of >=>
+                        === \a -> (join . fmap returnJoin) (f a)   -- assumption about (.)
+                        === \a -> id (f a)                         -- second monadJoin law
+                        === \a -> f a                              -- definition of id
+                        === f                                      -- η - reduction
 -}

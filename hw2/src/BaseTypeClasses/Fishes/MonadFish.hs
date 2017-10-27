@@ -42,7 +42,7 @@ instance MonadFish m => Monad m where
     m >>= f = const m >=> f $ ()
 
 instance MonadFish m => MonadJoin m where
-    returnJoin = return
+    returnJoin = returnFish
 
     join m = const m >=> id $ () -- OR join = (>>= id)  (using instance for Monad)
 
@@ -62,7 +62,11 @@ instance MonadFish m => MonadJoin m where
 -- 2) instance MonadFish m => MonadJoin m
 -- TODO
 {- join . pure ≡ id
-    join . pure === join. return
-                === (const m >=> id) () . return
-                === \x ->
+    join . pure === join. returnFish                                            -- assuming pure === returnFish
+                === (\m -> (const m >=> id) ()) . returnFish                    -- definition of join
+                === \x -> (\m -> (const m >=> id) ()) (returnFish x)            -- assumption about (.)
+                === \x -> (const (returnFish x) >=> id) ()                      -- β - reduction
+                === \x -> ((\_ -> returnFish x) >=> id) ()                      -- definition of const
+                ===      -- η equivalence
+                === \x' _ -> returnFish x'
 -}
