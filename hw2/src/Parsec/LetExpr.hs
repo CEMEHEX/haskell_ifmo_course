@@ -10,18 +10,23 @@ import           Parsec.Parser              (Parser, char, ident, oneOrMore,
 type VarName = String
 
 data Var = Var VarName | Const Integer
+    deriving (Eq)
 
 data Let = Let { letVarName :: VarName
                , vars       :: [Var]
                }
+               deriving (Eq)
 
 newtype LetExpr = LetExpr [Let]
+    deriving(Eq)
 
 data OptimizedLet = OptLet { optLetVarName :: VarName
                            , result        :: Integer
                            }
+                           deriving (Eq)
 
 newtype OptimizedLetExpr = OptLetExpr [OptimizedLet]
+    deriving (Eq)
 
 parseVar :: Parser Var
 parseVar = Var <$> ident <|> Const <$> posInt
