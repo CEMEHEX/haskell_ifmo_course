@@ -3,7 +3,7 @@ version:             0.1.0.0
 synopsis:            Synopsis for task 1
 description:         Task 1 for FP ITMO course
 
-homepage:            https://github.com/username/TemplateHW/tree/master/hw1#readme
+homepage:            https://bitbucket.org/CEMEHEX/haskell-homeworks
 license:             MIT
 license-file:        LICENSE
 author:              Semyon Yekhmenin

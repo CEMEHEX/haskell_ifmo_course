@@ -24,13 +24,11 @@ eval (Const a)           = return a
 eval (Addition x y)      = wrapSafe (+) noError NoError x y
 eval (Subtraction x y)   = wrapSafe (-) noError NoError x y
 eval (Multipliation x y) = wrapSafe (*) noError NoError x y
-eval (Division x y)      = wrapSafe div checker divByZeroErr x y
+eval (Division x y)      = wrapSafe div checker DivByZero x y
   where
-      divByZeroErr = DivByZero
       checker _ b = b == 0
-eval (Power x y) = wrapSafe (^) checker negativeExpErr x y
+eval (Power x y)         = wrapSafe (^) checker NegativeExp x y
   where
-      negativeExpErr = NegativeExp
       checker _ b = b < 0
 
 wrapSafe :: BinOp
