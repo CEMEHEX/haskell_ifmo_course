@@ -62,8 +62,8 @@ instance (Functor m, MonadJoin m) => MonadFish m where
 
 -- 2) instance (Functor m, MonadJoin m) => MonadFish m
 
-{- returnFish >=> f ≡ f
-    returnFish >=> f    === returnJoin >=> f                       -- definiiton of returnFish
+{- f >=> returnFish ≡ f
+    f >=> returnFish    === f >=> returnJoin                       -- definition of returnFish
                         === \a -> join $ fmap returnJoin (f a)     -- definition of >=>
                         === \a -> (join . fmap returnJoin) (f a)   -- assumption about (.)
                         === \a -> id (f a)                         -- second monadJoin law

@@ -1,11 +1,14 @@
 module Nondeterminism.BinarySeq where
 
+-- import Control.Monad (replicateM)
+
 genBinSeq :: (Integral a) => a -> [[Int]]
 genBinSeq 0 = [[]] -- (1): definition for 0
 genBinSeq n =      -- (2): definition for n
     [0, 1] >>= \x ->
     genBinSeq (n - 1) >>= \xs ->
     return $ x:xs
+-- genBinSeq = flip replicateM [0,1]
 
 -- genBinSeq n >>= \x -> genBinSeq m >>= \y -> return $ x ++ y === genBinSeq (n + m) (Th)
 

@@ -58,6 +58,14 @@ instance Monad m => MonadJoin m where
                      === \a -> f a                            -- first monad law
                      === f                                    -- η - reduction
 -}
+{- (f >=> g) >=> h  ≡ f >=> (g >=> h)
+    (f >=> g) >=> h === (\a -> f a >>= g) >=> h               -- definition of >=>
+                    === \b -> (\a -> f a >>= g) b >>= h       -- definition of >=>
+                    === \b -> f b >>= g >>= h                 -- β - reduction
+                    === \b -> f b >>= \x -> g x >>= h         -- third monad law
+                    === \b -> f b >>= (g >=> h)               -- definition of >=>
+                    === f >=> (g >=> h)                       -- definition of >=>
+-}
 
 -- 2) instance Monad m => MonadJoin m
 
@@ -68,4 +76,13 @@ instance Monad m => MonadJoin m where
                 === \x -> return x >>= id                   -- β - reduction
                 === \x -> id x                              -- second monad law
                 === id                                      -- η - reduction
+-}
+-- TODO
+{- join . fmap join ≡ join . join
+   join . fmap join === \x -> join (fmap join x)                        -- assumption about (.)
+                    === \x -> join (x >>= (return . join))              -- equality for fmap
+                    === \x -> join (x >>= \y -> return (join y))        -- assumption about (.)
+                    === \x -> join (x >>= \y -> return (y >>= id))      -- definition of join
+                    === \x -> (x >>= \y -> return (y >>= id)) >>= id    -- definition of join
+
 -}

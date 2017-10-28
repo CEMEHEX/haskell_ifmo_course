@@ -67,6 +67,5 @@ instance MonadFish m => MonadJoin m where
                 === \x -> (\m -> (const m >=> id) ()) (returnFish x)            -- assumption about (.)
                 === \x -> (const (returnFish x) >=> id) ()                      -- β - reduction
                 === \x -> ((\_ -> returnFish x) >=> id) ()                      -- definition of const
-                ===      -- η equivalence
-                === \x' _ -> returnFish x'
+                ===
 -}
