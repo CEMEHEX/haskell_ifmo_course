@@ -71,7 +71,7 @@ instance MonadFish m => MonadJoin m where
                 === \x -> (\_ -> id x) ()                                       -- fourth monadFish law
                 === \x -> id x                                                  -- β - reduction
                 === id                                                          -- η - reduction
--- TODO
+-- TODO proof it
 fourth monadFish law: (\_ -> returnFish x) >=> f  === \_ -> f x
     (\_ -> returnFish x) >=> f  ===
 -}
