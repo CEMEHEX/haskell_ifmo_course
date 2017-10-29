@@ -30,7 +30,6 @@ instance Alternative Parser where
     (Parser p1) <|> (Parser p2) = Parser $ \s -> p1 s <|> p2 s
 
 instance Monad Parser where
-    -- :: Parser a -> (a -> Parser b) -> Parser b
     (Parser p) >>= f = Parser $
         p >=> \(a, s') ->
         runParser (f a) s'
@@ -93,3 +92,60 @@ spaces = zeroOrMore space
 
 ident :: Parser String
 ident = (:) <$> satisfy isAlpha <*> zeroOrMore (satisfy isAlphaNum)
+
+-- PROOFS:
+
+{- fmap id === id (OR fmap id p === p)
+    fmap id p   === Parser $ fmap (first id) . runParser p                      -- definition of fmap
+                === Parser $ \s -> fmap (first id) (runParser p s)              -- definition of (.)
+
+--  first id (a, b) === (a, b) => first id === id                               -- definition of first
+
+                === Parser $ \s -> fmap id (runParser p s)                      -- first id === id
+                === Parser $ \s -> runParser p s                                -- first fmap law
+                === Parser $ runParser p                                        -- η - reduction
+                === p                                                           -- definition of Parser
+-}
+
+{- pure id <*> p = p
+    pure id <*> (Parser p)  === Parser (\s -> Just (id, s)) <*> (Parser p)      -- definition of pure
+                            === Parser $ \s ->
+                                Just (id, s)  >>= \(f, s') ->
+                                p s' >>= \(v, s'') ->
+                                return (f v, s'')                               -- definition of <*>
+                            === Parser $ \s ->
+                                p s >>= \(v, s'') ->
+                                return (id v, s'')                              -- definition of >>=
+                            === Parser $ \s ->
+                                ps >>= \(v, s'') -> return (v, s'')             -- definition of id
+                            === Parser $ \s -> p s >>= return                   -- η - reduction
+                            === Parser $ \s -> p s                              -- first monad law
+                            === Parser p                                        -- η - reduction
+-}
+
+{- empty <|> u === u <|> empty === u
+    empty <|> Parser p  === Parser $ (const Nothing) <|> Parser p                 -- definition of empty
+                        === Parser $ \s -> (const Nothing) s <|> p s            -- definition of <|>
+                        === Parser $ \s -> Nogthing <|> p s                     -- β - reduction
+                        === Parser $ \s -> p s                                  -- definition of <|> for Maybe
+                        === Parser p                                            -- η - reduction
+
+    Parser p <|> empty === Parser $ Parser p <|> const Nothing                  -- similarly...
+-}
+
+{- Parser p >>= return === Parser p
+    Parser p >>= return === Parser $ \s ->
+                                p s >>= \(a, s') ->
+                                runParser (return a) s'                         -- definition of >>=
+                        === Parser $ \s ->
+                                p s >>= \(a, s') ->
+                                runParser (Parser $ \s -> Just (a, s)) s'       -- definition of return(pure)
+                        === Parser $ \s ->
+                                p s >>= \(a, s') ->
+                                Just (a, s')                                    -- definition of runParser and β - reduction
+                        === Parser $ \s ->
+                                p s >>= \(a, s') -> return (a, s')              -- definition of return for Maybe
+                        === Parser $ \s -> p s >>= return                       -- η - reduction
+                        === Parser $ \s -> p s                                  -- first monad law
+                        === Parser p                                            -- η - reduction
+-}
