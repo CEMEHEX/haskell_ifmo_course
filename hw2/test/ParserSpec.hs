@@ -32,7 +32,7 @@ spec = do
     it "SExpr parser" $ do
         runParser parseSExpr "" `shouldBe` Nothing
         runParser parseSExpr "5" `shouldBe` Just (A (N 5), "")
-        runParser parseSExpr " \n\t  5" `shouldBe` Just (A (N 5), "")
+        runParser parseSExpr " \t  5" `shouldBe` Just (A (N 5), "")
         runParser parseSExpr "(bar (foo) 3 5 874)" `shouldBe`
             Just (Comb [A (I "bar"), Comb [A (I "foo")], A (N 3), A (N 5), A (N 874)], "")
         runParser parseSExpr "( lots of ( spaces in ) this ( one ) )" `shouldBe`
@@ -70,6 +70,6 @@ spec = do
         runParser parseAndOptLetExpr "let x=1" `shouldBe`
             Just (OptLetExpr [OptLet "x" 1], "")
         runParser parseAndOptLetExpr
-            "let \tx = 1 + 2 + 5\n   let   y = x+x  \r\tlet z=0+    x   + y + 8"
+            "let \tx = 1 + 2 + 5\n   let   y = x+x  \n\r\tlet z=0+    x   + y + 8"
             `shouldBe`
             Just (OptLetExpr [OptLet "x" 8, OptLet "y" 16, OptLet "z" 32], "")

@@ -83,7 +83,7 @@ upper :: Parser Char
 upper = satisfy isUpper
 
 space :: Parser Char
-space = satisfy isSpace
+space = satisfy $ \c -> isSpace c && c /= '\n'
 
 ignored :: Parser a -> Parser ()
 ignored = (*> pure ())

@@ -4,8 +4,8 @@ import           Control.Applicative        ((<|>))
 import           Control.Monad.Trans.Reader (Reader, reader, runReader)
 import           Control.Monad.Trans.State  (State, evalState, state)
 import qualified Data.Map.Strict            as Map (Map, empty, insert, lookup)
-import           Parsec.Parser              (Parser, char, ident, oneOrMore,
-                                             posInt, sepBy, skipWS, string)
+import           Parsec.Parser              (Parser, char, ident, posInt, sepBy,
+                                             skipWS, spaces, string)
 
 type VarName = String
 
@@ -37,13 +37,11 @@ parseLet =
     skipWS ident >>= \x ->
     skipWS (char '=') >>
     (parseVar `sepBy` "+") >>= \xs ->
-    return $ Let x xs
+    spaces >>
+    return (Let x xs)
 
 parseLetExpr :: Parser LetExpr
-parseLetExpr = LetExpr <$> oneOrMore parseLet
-
-showListSep :: (Show a) => String -> [a] -> String
-showListSep sep xs = foldr1 (\a b -> a ++ sep ++ b) $ show <$> xs
+parseLetExpr = LetExpr <$> (parseLet `sepBy` "\n")
 
 evalVar :: Var -> Reader (Map.Map String Integer) (Maybe Integer)
 evalVar (Const n)  = reader . const $ Just n
@@ -63,6 +61,9 @@ optimize (LetExpr lets) = OptLetExpr $ evalState (mapM evalLet lets) Map.empty
 
 parseAndOptLetExpr :: Parser OptimizedLetExpr
 parseAndOptLetExpr = optimize <$> parseLetExpr
+
+showListSep :: (Show a) => String -> [a] -> String
+showListSep sep xs = foldr1 (\a b -> a ++ sep ++ b) $ show <$> xs
 
 instance Show LetExpr where
     show (LetExpr lets) = showListSep "\n" lets

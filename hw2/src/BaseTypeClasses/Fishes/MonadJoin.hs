@@ -11,7 +11,7 @@ class Monad m where
     (>>=)      :: m a -> (a -> m b) -> m b
 
     {- LAWS
-        1. m >>= return    ≡ m                              -- first mpnad law
+        1. m >>= return    ≡ m                              -- first monad law
         2. return a >>= f  ≡ f a                            -- second monad law
         3. (m >>= f) >>= g ≡ m >>= (\x -> f x >>= g)        -- third monad law
     -}
@@ -34,6 +34,7 @@ class MonadJoin m where
         1. join . pure            ≡ id
         2. join . fmap returnJoin ≡ id
         3. join . fmap join       ≡ join . join
+        4* join . fmap (fmap f)   ≡ fmap f . join
     -}
 
 instance (Functor m, MonadJoin m) => Monad m where

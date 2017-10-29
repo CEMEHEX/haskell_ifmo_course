@@ -23,7 +23,11 @@ library
                      , BaseTypeClasses.Fishes.Monad
                      , BaseTypeClasses.Fishes.MonadFish
                      , BaseTypeClasses.Fishes.MonadJoin
-                     , BaseTypeClasses.ChaoticGood
+                     , BaseTypeClasses.ChaoticGood.Identity
+                     , BaseTypeClasses.ChaoticGood.Either
+                     , BaseTypeClasses.ChaoticGood.Tree
+                     , BaseTypeClasses.ChaoticGood.Const
+                     , BaseTypeClasses.ChaoticGood.Pair
                      , Parsec.Parser, Parsec.Simple, Parsec.SExpr, Parsec.LetExpr
   ghc-options:         -Wall
   build-depends:       base >= 4.9 && < 5

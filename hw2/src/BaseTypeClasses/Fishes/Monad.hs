@@ -11,7 +11,7 @@ class Monad m where
     (>>=)      :: m a -> (a -> m b) -> m b
 
     {- LAWS
-        1. m >>= return    ≡ m                              -- first mpnad law
+        1. m >>= return    ≡ m                              -- first monad law
         2. return a >>= f  ≡ f a                            -- second monad law
         3. (m >>= f) >>= g ≡ m >>= (\x -> f x >>= g)        -- third monad law
     -}
@@ -34,6 +34,7 @@ class MonadJoin m where
         1. join . pure            ≡ id
         2. join . fmap returnJoin ≡ id
         3. join . fmap join       ≡ join . join
+        4* join . fmap (fmap f)   ≡ fmap f . join
     -}
 
 instance Monad m => MonadFish m where
@@ -76,13 +77,4 @@ instance Monad m => MonadJoin m where
                 === \x -> return x >>= id                   -- β - reduction
                 === \x -> id x                              -- second monad law
                 === id                                      -- η - reduction
--}
--- TODO
-{- join . fmap join ≡ join . join
-   join . fmap join === \x -> join (fmap join x)                        -- assumption about (.)
-                    === \x -> join (x >>= (return . join))              -- equality for fmap
-                    === \x -> join (x >>= \y -> return (join y))        -- assumption about (.)
-                    === \x -> join (x >>= \y -> return (y >>= id))      -- definition of join
-                    === \x -> (x >>= \y -> return (y >>= id)) >>= id    -- definition of join
-
 -}
