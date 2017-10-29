@@ -130,7 +130,8 @@ ident = (:) <$> satisfy isAlpha <*> zeroOrMore (satisfy isAlphaNum)
                         === Parser $ \s -> p s                                  -- definition of <|> for Maybe
                         === Parser p                                            -- η - reduction
 
-    Parser p <|> empty === Parser $ Parser p <|> const Nothing                  -- similarly...
+    Parser p <|> empty === Parser $ Parser p <|> const Nothing                  -- definition of empty
+                       === ...                                                  -- similarly...
 -}
 
 {- Parser p >>= return === Parser p

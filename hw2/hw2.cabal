@@ -29,6 +29,7 @@ library
                      , BaseTypeClasses.ChaoticGood.Const
                      , BaseTypeClasses.ChaoticGood.Pair
                      , Parsec.Parser, Parsec.Simple, Parsec.SExpr, Parsec.LetExpr
+                     , Monstupar.Parser, Monstupar.Simple, Monstupar.SExpr, Monstupar.LetExpr
   ghc-options:         -Wall
   build-depends:       base >= 4.9 && < 5
                      , transformers
@@ -46,7 +47,7 @@ test-suite hw2-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  other-modules:       OptionalMonadsSpec, NondeterminismSpec, ParserSpec
+  other-modules:       OptionalMonadsSpec, NondeterminismSpec, ParserSpec, MonstuparSpec
   build-depends:       base
                      , hw2
                      , hspec
