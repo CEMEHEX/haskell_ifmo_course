@@ -46,6 +46,7 @@ instance MonadFish m => MonadJoin m where
     returnJoin = returnFish
 
     join m = const m >=> id $ () -- OR join = (>>= id)  (using instance for Monad)
+    -- join  = id >=> id
 
 --ASSUMPTION: f . g === \x -> f (g x)
 
@@ -61,7 +62,6 @@ instance MonadFish m => MonadJoin m where
 -}
 
 -- 2) instance MonadFish m => MonadJoin m
-
 {- join . pure ≡ id
     join . pure === join . returnFish                                            -- assuming pure === returnJoin, returnJoin === returnFish
                 === (\m -> (const m >=> id) ()) . returnFish                    -- definition of join
@@ -71,7 +71,15 @@ instance MonadFish m => MonadJoin m where
                 === \x -> (\_ -> id x) ()                                       -- fourth monadFish law
                 === \x -> id x                                                  -- β - reduction
                 === id                                                          -- η - reduction
--- TODO proof it
+
 fourth monadFish law: (\_ -> returnFish x) >=> f  === \_ -> f x
-    (\_ -> returnFish x) >=> f  ===
+    (\_ -> returnFish x) >=> f  === (returnFish . const x) >=> f                -- definition of const and (.)
+                                === (returnFish >=> f) . const x                -- assoc.
+                                === f . const x                                 -- second MonadFish law
+                                === \x_ -> f x                                  -- definition of const and (.)
+-- TODO proof it
+assoc. : (k1 . f) >=> k2 === (k1 >=> k2) . f
+    (k1 . f) >=> k2 === (\x -> k1 (f x)) >=> k2
+
+    (k1 >=> k2) . f === \x -> (k1 >=> k2) (f x)
 -}

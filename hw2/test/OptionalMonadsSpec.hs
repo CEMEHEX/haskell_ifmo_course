@@ -18,6 +18,7 @@ spec = do
       eval (Power (Const 4) (Const 3)) `shouldBe` Right 64
       eval (Addition (Const 6) (Power (Const 6) (Division (Addition (Const 13) (Const 17))
            (Subtraction (Const 20) (Const 5))))) `shouldBe` Right 42
+      eval (Power (Const 0) (Const 0)) `shouldBe` Right 1
   it "ArithmMustFail" $ do
       eval (Division (Const 1) (Const 0)) `shouldBe` Left DivByZero
       eval (Power (Const 42) (Const (-42))) `shouldBe` Left NegativeExp

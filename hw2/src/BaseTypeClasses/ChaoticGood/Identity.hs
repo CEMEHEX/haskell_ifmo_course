@@ -43,20 +43,7 @@ instance Traversable Identity where
         === Identity a <*> Identity (b (c))                                     -- definition of <*>
         === Identity a <*> (Identity b <*> Identity c)                          -- definition of <*>
 -}
-newtype Compose f g a = Compose (f (g a))
-instance (Functor f, Functor g) => Functor (Compose f g) where
-    fmap f (Compose x) = Compose (fmap (fmap f) x)
-instance (Applicative f, Applicative g) => Applicative (Compose f g) where
-    pure x = Compose (pure (pure x))
-    Compose f <*> Compose x = Compose ((<*>) <$> f <*> x)
 
-t1:: (Applicative g, Applicative f) =>
-        Identity (f (g a)) -> Compose f g (Identity a)
-t1 (Identity a) = Compose (fmap (fmap Identity) a)
-
-t2 :: (Applicative f, Applicative g) =>
-        Identity (f (g a)) -> Compose f g (Identity a)
-t2 (Identity a) = Compose (fmap (sequenceA . Identity) a)
 {- Traversable3: sequenceA . fmap Compose === Compose . fmap sequenceA . sequenceA
     (sequenceA . fmap Compose) (Identity a)
         === sequenceA (fmap Compose (Identity a))                   -- definition of (.)
