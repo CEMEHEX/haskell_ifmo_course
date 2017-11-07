@@ -1,13 +1,10 @@
-resolver: lts-9.4
-
+flags: {}
+extra-package-dbs: []
 packages:
 - hw1
 - hw2
 - hw3
 - bonus
-
-extra-deps: []
-
-flags: {}
-
-extra-package-dbs: []
+extra-deps:
+- megaparsec-6.2.0
+resolver: lts-9.4
