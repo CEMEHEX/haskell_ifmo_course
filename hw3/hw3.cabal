@@ -18,8 +18,8 @@ tested-with:         GHC == 8.0.1
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Utils.Expression
-                     , Parsing.ExprParser
+  exposed-modules:     Construction.Expression
+                     , Parsing.ExprParser, Parsing.Utils
   ghc-options:         -Wall
   build-depends:       base >= 4.9 && < 5
                      , containers

@@ -1,9 +1,6 @@
-module Utils.Expression
+module Construction.Expression
     (
       Expr(..)
-    , eval
-    , runEvaluation
-    , ExprEvaluation()
     , getResult
     ) where
 
@@ -27,7 +24,7 @@ newtype ExprEvaluation = ExprEvaluation
     { runEvaluation :: ReaderT (NameToVal Integer) (Either ArithmError) Integer }
 
 data ArithmError = DivByZero
-                 | VarNotInScope
+                 | VarNotInScope T.Text
                  deriving (Show, Eq)
 
 data Expr = Lit Integer
@@ -47,7 +44,7 @@ eval (Lit x)        = ExprEvaluation $ return x
 eval (Var x)        = ExprEvaluation $ do
     m <- ask
     case Map.lookup x m of
-        Nothing  -> lift $ Left VarNotInScope
+        Nothing  -> lift . Left . VarNotInScope $ x
         Just val -> return val
 eval (Add x y)      = wrapSafe (+) x y noCheckers
 eval (Sub x y)      = wrapSafe (-) x y noCheckers
