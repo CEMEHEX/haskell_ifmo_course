@@ -15,16 +15,16 @@ import           Text.Megaparsec.Expr    (Operator (..), makeExprParser)
 -- whileParser :: Parser Expr
 -- whileParser = between spaceConsumer eof exprParser
 
-exprParser :: Parser Expr
+exprParser :: Parser (Expr Integer)
 exprParser = makeExprParser arithmTerm arithmOperators
 
-arithmOperators :: [[Operator Parser Expr]]
+arithmOperators :: [[Operator Parser (Expr Integer)]]
 arithmOperators =
     [ [InfixL (Mul <$ symbol "*"), InfixL (Div <$ symbol "/")]
     , [InfixL (Add <$ symbol "+"), InfixL (Sub <$ symbol "-")]
     ]
 
-arithmTerm :: Parser Expr
+arithmTerm :: Parser (Expr Integer)
 arithmTerm =
     Lit <$> integer <|>
     Var <$> identifier <|>
