@@ -8,13 +8,12 @@ module Parsing.ExprParser
 import           Construction.Expression (Expr (..))
 import           Control.Applicative     ((<|>))
 import           Parsing.Utils           (Parser, identifier, integer, parens,
-                                          rword, spaceConsumer, symbol)
-import           Text.Megaparsec         (between, eof)
+                                          rword, symbol)
 import           Text.Megaparsec.Expr    (Operator (..), makeExprParser)
 
 
-whileParser :: Parser Expr
-whileParser = between spaceConsumer eof exprParser
+-- whileParser :: Parser Expr
+-- whileParser = between spaceConsumer eof exprParser
 
 exprParser :: Parser Expr
 exprParser = makeExprParser arithmTerm arithmOperators

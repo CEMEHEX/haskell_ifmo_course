@@ -4,6 +4,7 @@ module Construction.Expression
     , getResult
     ) where
 
+import           Construction.Error   (ArithmError (..))
 import           Control.Applicative  (ZipList (ZipList))
 import           Control.Monad.Reader (ReaderT, ask, lift, local, runReaderT,
                                        when)
@@ -22,11 +23,7 @@ type SafeWrapper a e = BinOp a
 
 newtype ExprEvaluation = ExprEvaluation
     { runEvaluation :: ReaderT (NameToVal Integer) (Either ArithmError) Integer }
-
-data ArithmError = DivByZero
-                 | VarNotInScope T.Text
-                 deriving (Show, Eq)
-
+-- TODO do it in more generic way
 data Expr = Lit Integer
           | Var VarName
           | Add Expr Expr
