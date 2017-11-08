@@ -16,27 +16,27 @@ type BinOp a = a -> a -> a
 type NameToVal a = Map.Map VarName a
 type ErrorCheckers a e = [a -> a -> Either e ()]
 type SafeWrapper a e = BinOp a
-                    -> Expr
-                    -> Expr
+                    -> Expr a
+                    -> Expr a
                     -> ErrorCheckers a e
-                    -> ExprEvaluation
+                    -> ExprEvaluation a
 
-newtype ExprEvaluation = ExprEvaluation
-    { runEvaluation :: ReaderT (NameToVal Integer) (Either ArithmError) Integer }
--- TODO do it in more generic way
-data Expr = Lit Integer
+newtype ExprEvaluation a = ExprEvaluation
+    { runEvaluation :: ReaderT (NameToVal a) (Either ArithmError) a }
+
+data Expr a = Lit a
           | Var VarName
-          | Add Expr Expr
-          | Sub Expr Expr
-          | Mul Expr Expr
-          | Div Expr Expr
-          | Let VarName Expr Expr
+          | Add (Expr a) (Expr a)
+          | Sub (Expr a) (Expr a)
+          | Mul (Expr a) (Expr a)
+          | Div (Expr a) (Expr a)
+          | Let VarName (Expr a) (Expr a)
           deriving (Show, Eq)
 
-getResult :: Expr -> NameToVal Integer -> Either ArithmError Integer
+getResult :: (Integral a) => Expr a -> NameToVal a -> Either ArithmError a
 getResult = runReaderT . runEvaluation . eval
 
-eval :: Expr -> ExprEvaluation
+eval :: (Integral a) => Expr a -> ExprEvaluation a
 eval (Lit x)        = ExprEvaluation $ return x
 eval (Var x)        = ExprEvaluation $ do
     m <- ask
@@ -51,7 +51,7 @@ eval (Let name x y) = ExprEvaluation $ do
     xVal <- runEvaluation $ eval x
     local (Map.insert name xVal) (runEvaluation $ eval y)
 
-wrapSafe :: SafeWrapper Integer ArithmError
+wrapSafe :: (Integral a) => SafeWrapper a ArithmError
 wrapSafe op x y checkers = ExprEvaluation $ do
     xVal <- runEvaluation $ eval x
     yVal <- runEvaluation $ eval y
@@ -64,5 +64,5 @@ runCheckers a b checkers = sequence_ $ ZipList checkers <*> pure a <*> pure b
 noCheckers :: ErrorCheckers a e
 noCheckers = []
 
-divCheckers :: ErrorCheckers Integer ArithmError
+divCheckers :: (Num a, Eq a) => ErrorCheckers a ArithmError
 divCheckers = [\_ b -> when (b == 0) $ Left DivByZero]
