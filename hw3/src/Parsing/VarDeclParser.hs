@@ -5,11 +5,15 @@ module Parsing.VarDeclParser
       varDeclParser
     ) where
 
-import           Construction.Variable (VarDecl (..))
-import           Control.Applicative   ((<|>))
-import           Parsing.Utils
+import           Control.Applicative     ((<|>))
 
-varDeclParser :: Parser (VarDecl Integer)
+import           Construction.Expression (Expr)
+import           Construction.Variable   (VarDecl (..))
+
+import           Parsing.ExprParser      (exprParser)
+import           Parsing.Utils           (Parser, identifier, rword, symbol)
+
+varDeclParser :: Parser (VarDecl (Expr Integer))
 varDeclParser =
-    New <$ rword "mut" <*> identifier <* symbol "=" <*> integer <|>
-    Upd <$> identifier <* symbol "=" <*> integer
+    New <$ rword "mut" <*> identifier <* symbol "=" <*> exprParser <|>
+    Upd <$> identifier <* symbol "=" <*> exprParser
