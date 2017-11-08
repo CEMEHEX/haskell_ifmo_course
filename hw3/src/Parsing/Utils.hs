@@ -46,7 +46,7 @@ rword :: Text -> Parser ()
 rword w = lexeme (string w *> notFollowedBy alphaNumChar)
 
 rws :: [Text] -- list of reserved words
-rws = ["let", "in"]
+rws = ["let", "in", "mut"]
 
 identifier :: Parser Text
 identifier = (lexeme . try) (p >>= check)

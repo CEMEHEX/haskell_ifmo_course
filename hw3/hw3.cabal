@@ -21,8 +21,10 @@ library
   exposed-modules:     Construction.Expression
                      , Construction.MutableVar
                      , Construction.Error
+                     , Construction.Variable
                      , Parsing.ExprParser
                      , Parsing.Utils
+                     , Parsing.VarDeclParser
   ghc-options:         -Wall
   build-depends:       base >= 4.9 && < 5
                      , containers

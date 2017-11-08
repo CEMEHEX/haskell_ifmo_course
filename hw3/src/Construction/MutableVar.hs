@@ -1,7 +1,7 @@
 module Construction.MutableVar
     (
-      runAlt
-    ,  getVars
+      VarAlteration
+    , getVars
     , create
     , update
     ) where
