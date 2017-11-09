@@ -1,19 +1,17 @@
-module Construction.Expression
+module Language.Expression
     (
       Expr(..)
     , getResult
     ) where
 
-import           Construction.Error   (ArithmError (..))
 import           Control.Applicative  (ZipList (ZipList))
 import           Control.Monad.Reader (ReaderT, ask, lift, local, runReaderT,
                                        when)
-import qualified Data.Map.Strict      as Map (Map, insert, lookup)
-import qualified Data.Text            as T (Text)
+import qualified Data.Map.Strict      as Map (insert, lookup)
+import           Language.Utils       (Error (DivByZero, VarNotInScope),
+                                       Expr (..), NameToVal)
 
-type VarName = T.Text
 type BinOp a = a -> a -> a
-type NameToVal a = Map.Map VarName a
 type ErrorCheckers a e = [a -> a -> Either e ()]
 type SafeWrapper a e = BinOp a
                     -> Expr a
@@ -22,18 +20,9 @@ type SafeWrapper a e = BinOp a
                     -> ExprEvaluation a
 
 newtype ExprEvaluation a = ExprEvaluation
-    { runEvaluation :: ReaderT (NameToVal a) (Either ArithmError) a }
+    { runEvaluation :: ReaderT (NameToVal a) (Either Error) a }
 
-data Expr a = Lit a
-          | Var VarName
-          | Add (Expr a) (Expr a)
-          | Sub (Expr a) (Expr a)
-          | Mul (Expr a) (Expr a)
-          | Div (Expr a) (Expr a)
-          | Let VarName (Expr a) (Expr a)
-          deriving (Show, Eq)
-
-getResult :: (Integral a) => Expr a -> NameToVal a -> Either ArithmError a
+getResult :: (Integral a) => Expr a -> NameToVal a -> Either Error a
 getResult = runReaderT . runEvaluation . eval
 
 eval :: (Integral a) => Expr a -> ExprEvaluation a
@@ -51,7 +40,7 @@ eval (Let name x y) = ExprEvaluation $ do
     xVal <- runEvaluation $ eval x
     local (Map.insert name xVal) (runEvaluation $ eval y)
 
-wrapSafe :: (Integral a) => SafeWrapper a ArithmError
+wrapSafe :: (Integral a) => SafeWrapper a Error
 wrapSafe op x y checkers = ExprEvaluation $ do
     xVal <- runEvaluation $ eval x
     yVal <- runEvaluation $ eval y
@@ -64,5 +53,5 @@ runCheckers a b checkers = sequence_ $ ZipList checkers <*> pure a <*> pure b
 noCheckers :: ErrorCheckers a e
 noCheckers = []
 
-divCheckers :: (Num a, Eq a) => ErrorCheckers a ArithmError
+divCheckers :: (Num a, Eq a) => ErrorCheckers a Error
 divCheckers = [\_ b -> when (b == 0) $ Left DivByZero]

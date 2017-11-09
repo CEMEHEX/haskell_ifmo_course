@@ -5,13 +5,13 @@ module Parsing.VarDeclParser
       varDeclParser
     ) where
 
-import           Control.Applicative     ((<|>))
+import           Control.Applicative   ((<|>))
 
-import           Construction.Expression (Expr)
-import           Construction.Variable   (VarDecl (..))
+import           Language.Construction (VarDecl (..))
+import           Language.Expression   (Expr)
 
-import           Parsing.ExprParser      (exprParser)
-import           Parsing.Utils           (Parser, identifier, rword, symbol)
+import           Parsing.ExprParser    (exprParser)
+import           Parsing.Utils         (Parser, identifier, rword, symbol)
 
 varDeclParser :: Parser (VarDecl (Expr Integer))
 varDeclParser =

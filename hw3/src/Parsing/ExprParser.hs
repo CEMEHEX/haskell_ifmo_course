@@ -5,11 +5,11 @@ module Parsing.ExprParser
       exprParser
     ) where
 
-import           Construction.Expression (Expr (..))
-import           Control.Applicative     ((<|>))
-import           Parsing.Utils           (Parser, identifier, integer, parens,
-                                          rword, symbol)
-import           Text.Megaparsec.Expr    (Operator (..), makeExprParser)
+import           Control.Applicative  ((<|>))
+import           Language.Expression  (Expr (..))
+import           Parsing.Utils        (Parser, identifier, integer, parens,
+                                       rword, symbol)
+import           Text.Megaparsec.Expr (Operator (..), makeExprParser)
 
 
 -- whileParser :: Parser Expr

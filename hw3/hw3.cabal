@@ -18,10 +18,10 @@ tested-with:         GHC == 8.0.1
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Construction.Expression
-                     , Construction.MutableVar
-                     , Construction.Error
-                     , Construction.Variable
+  exposed-modules:     Language.Expression
+                     , Language.MutableVar
+                     , Language.Utils
+                     , Language.Construction
                      , Parsing.ExprParser
                      , Parsing.Utils
                      , Parsing.VarDeclParser
