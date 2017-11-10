@@ -18,7 +18,7 @@ getVars :: Command a
         -> NameToVal a
         -> Either Error (NameToVal a)
 getVars = execStateT . runCmd
-
+-- TODO replace case of construction with maybe
 create :: VarName -> a -> Command a
 create name value = Command $ do
     m <- gets $ Map.lookup name

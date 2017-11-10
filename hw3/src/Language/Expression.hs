@@ -29,6 +29,7 @@ eval :: (Integral a) => Expr a -> ExprEvaluation a
 eval (Lit x)        = ExprEvaluation $ return x
 eval (Var x)        = ExprEvaluation $ do
     m <- ask
+    -- TODO replace dat shit with maybe
     case Map.lookup x m of
         Nothing  -> lift . Left . VarNotInScope $ x
         Just val -> return val

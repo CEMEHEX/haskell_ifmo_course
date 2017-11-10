@@ -24,7 +24,7 @@ library
                      , Language.Construction
                      , Parsing.ExprParser
                      , Parsing.Utils
-                     , Parsing.VarDeclParser
+                     , Parsing.ConstructionsParser
   ghc-options:         -Wall
   build-depends:       base >= 4.9 && < 5
                      , containers
@@ -39,6 +39,8 @@ executable hw3
   ghc-options:         -Wall -Werror -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , hw3
+                     , text
+                     , megaparsec
   default-language:    Haskell2010
 
 test-suite hw3-test

@@ -22,6 +22,6 @@ data Expr a = Lit a
           deriving (Show, Eq)
 
 data Error = DivByZero
-           | VarNotInScope T.Text
-           | AlreadyExists T.Text
+           | VarNotInScope VarName
+           | AlreadyExists VarName
            deriving (Show, Eq)

@@ -1,0 +1,16 @@
+mut x = 42
+x = 30
+// my awesome language
+mut y = 86
+
+> y
+/*
+    I can even write block comments!!!!
+    !!!!!
+    !!!!!
+    !!!!
+*/
+
+y = 111
+
+< y - 111

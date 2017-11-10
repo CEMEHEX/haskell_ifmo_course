@@ -1,38 +1,51 @@
-{-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE FlexibleInstances         #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module Language.Construction
     (
-      VarDecl (..)
-    , Executable
-    , runExecutable
+      Statement (..)
+    , Program
     , runProgram
     ) where
 
-import           Control.Monad.State.Strict
+import           Control.Monad.State.Strict (get, lift)
+
 import           Language.Expression        (Expr, getResult)
 import           Language.MutableVar        (Command (..), create, update)
-import           Language.Utils
+import           Language.Utils             (VarName)
 
 -- TODO rename all this ugly shit
 
-data Program = forall e . (Executable e) => Program [e]
+type Program a = [Statement a]
 
-data VarDecl a = New VarName a | Upd VarName a
+data Statement a
+    = New VarName (Expr a)
+    | Upd VarName (Expr a)
+    | Out (Expr a)
+    | In VarName
+    | For VarName a a (Program a)
     deriving (Show, Eq)
 
-runProgram :: Program -> Command Integer
-runProgram (Program execs) = Command $ mapM_ (runCmd . runExecutable) execs
+runProgram :: Program Integer -> Command Integer
+runProgram program = Command $ mapM_ (runCmd . runStatement) program
 
-class Executable e where
-    runExecutable :: e -> Command Integer
+runStatement :: Statement Integer -> Command Integer
+runStatement (New name expr) = Command $ do
+    m <- get
+    result <- lift $ getResult expr m
+    runCmd $ create name result
+runStatement (Upd name expr) = Command $ do
+    m <- get
+    result <- lift $ getResult expr m
+    runCmd $ update name result
+runStatement (Out _) = undefined -- TODO
+runStatement (In _)  = undefined -- TODO
+runStatement (For name begin end program) = Command $ do
+    let mkIteration i = Command $ do {
+        runCmd $ create name i;
+        runCmd $ runProgram program;
+    }
+    mapM_ (runCmd . mkIteration) [begin..end]
 
-instance Executable (VarDecl (Expr Integer)) where
-    runExecutable (New name expr) = Command $ do
-        m <- get
-        result <- lift $ getResult expr m
-        runCmd $ create name result
-    runExecutable (Upd name expr) = Command $ do
-        m <- get
-        result <- lift $ getResult expr m
-        runCmd $ update name result
+
+-- runOut :: Out (Expr Integer) -> StateT (NameToVal a) (Either Error) ()
+-- runOut = undefined
