@@ -21,7 +21,7 @@ import           Data.Text                  as T (Text)
 import           Control.Monad.Except       (Except, ExceptT (..), runExceptT)
 import           Control.Monad.State.Strict (StateT (..), runStateT)
 import           Data.Void                  (Void)
-import           Text.Megaparsec.Error      (ParseError)
+import           Text.Megaparsec.Error      (ParseError, parseErrorPretty)
 import           Text.Megaparsec.Stream     (Token)
 
 type VarName = T.Text
@@ -40,7 +40,7 @@ data RuntimeError
     = DivByZero
     | VarNotInScope VarName
     | AlreadyExists VarName
-    | NoParse (ParseError (Token Text) Void)
+    | NoParse String
     deriving (Show, Eq)
 
 newtype Command a b =
@@ -62,7 +62,7 @@ data Statement a
 wrapParserOutput :: Either (ParseError (Token Text) Void) a
                  -> Either RuntimeError a
 wrapParserOutput (Right a) = Right a
-wrapParserOutput (Left e)  = Left $ NoParse e
+wrapParserOutput (Left e)  = Left . NoParse . parseErrorPretty $ e
 
 mkExceptIO :: Except e a -> ExceptT e IO a
 mkExceptIO = ExceptT . return . runIdentity . runExceptT

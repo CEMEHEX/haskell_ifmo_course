@@ -1,13 +1,18 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Main where
 
-import qualified Data.Text.IO as T (readFile)
-import           Interpreter  (tryExecute)
+import qualified Data.Text          as T (Text)
+import qualified Data.Text.IO       as TIO (putStrLn, readFile)
+import           Interpreter        (run)
+import           System.Environment (getArgs)
 
 main :: IO ()
 main = do
-    filePath <- getLine
-    code <- T.readFile filePath
-    maybeErr <- tryExecute code
-    case maybeErr of
-        Left e -> print e
-        _      -> return ()
+    args <- getArgs
+    if length args /= 1
+        then TIO.putStrLn usage
+        else TIO.readFile (head args) >>= run
+
+usage :: T.Text
+usage = "USAGE: hw3 <path to program>"

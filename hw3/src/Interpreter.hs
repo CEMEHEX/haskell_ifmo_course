@@ -1,7 +1,6 @@
 module Interpreter
     (
-      tryExecute
-    , getTree
+      run
     ) where
 
 import           Control.Monad.Except        (ExceptT, runExceptT)
@@ -12,14 +11,18 @@ import           Data.Text                   as T (Text)
 
 import           Parsing.ConstructionsParser (sourceFileParser)
 
-import           Text.Megaparsec             (parseTest, runParser)
+import           Text.Megaparsec             (runParser)
 
 import           Language.Construction       (runProgram)
 import           Language.Utils              (RuntimeError, except, mkExceptIO,
                                               runIOAction, wrapParserOutput)
 
-getTree :: T.Text -> IO ()
-getTree = parseTest sourceFileParser
+run :: T.Text -> IO ()
+run code = do
+    maybeErr <- tryExecute code
+    case maybeErr of
+        Left e -> print e
+        _      -> return ()
 
 tryExecute :: T.Text -> IO (Either RuntimeError ())
 tryExecute = runExceptT . interpretFile
