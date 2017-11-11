@@ -5,15 +5,15 @@ module Parsing.ConstructionsParser
       sourceFileParser
     ) where
 
-import           Control.Applicative   ((<|>))
+import           Control.Applicative ((<|>))
 
-import           Language.Construction (Program, Statement (..))
+import           Language.Utils      (Program, Statement (..))
 
-import           Parsing.ExprParser    (exprParser)
-import           Parsing.Utils         (Parser, codeBlock, identifier, integer,
-                                        rword, spaceConsumer, symbol)
+import           Parsing.ExprParser  (exprParser)
+import           Parsing.Utils       (Parser, codeBlock, identifier, integer,
+                                      rword, spaceConsumer, symbol)
 
-import           Text.Megaparsec       (between, eof, many)
+import           Text.Megaparsec     (between, eof, many)
 
 
 varDeclParser :: Parser (Statement Integer)

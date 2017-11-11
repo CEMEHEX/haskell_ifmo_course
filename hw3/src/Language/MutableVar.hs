@@ -1,38 +1,34 @@
 module Language.MutableVar
     (
       Command (..)
-    , getVars
     , create
     , update
     , delete
     ) where
 
-import           Control.Monad.State.Strict
-import qualified Data.Map.Strict            as Map
-import           Language.Utils             (Error (AlreadyExists, VarNotInScope),
-                                             NameToVal, VarName)
+import           Control.Monad.State.Strict (gets, lift, modify)
+
+import qualified Data.Map.Strict            as Map (delete, insert, lookup)
+import           Language.Utils             (Command (..), RuntimeError (AlreadyExists, VarNotInScope),
+                                             VarName, except)
 
 
-newtype Command a = Command { runCmd :: StateT (NameToVal a) (Either Error) () }
 
-getVars :: Command a
-        -> NameToVal a
-        -> Either Error (NameToVal a)
-getVars = execStateT . runCmd
+
 -- TODO replace case of construction with maybe
-create :: VarName -> a -> Command a
+create :: VarName -> a -> Command a ()
 create name value = Command $ do
     m <- gets $ Map.lookup name
     case m of
         Nothing -> modify $ Map.insert name value
-        _       -> lift . Left . AlreadyExists $ name
+        _       -> lift . except . Left . AlreadyExists $ name
 
-update :: VarName -> a -> Command a
+update :: VarName -> a -> Command a ()
 update name value = Command $ do
     m <- gets $ Map.lookup name
     case m of
-        Nothing -> lift . Left . VarNotInScope $ name
+        Nothing -> lift . except . Left . VarNotInScope $ name
         _       -> modify $ Map.insert name value
 
-delete :: VarName -> Command a
+delete :: VarName -> Command a ()
 delete = Command . modify . Map.delete

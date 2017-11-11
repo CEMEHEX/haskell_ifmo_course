@@ -1,12 +1,13 @@
 module Main where
 
-import           Data.Text.IO                as T (readFile)
-import           Parsing.ConstructionsParser (sourceFileParser)
-import           Text.Megaparsec             (runParser)
+import qualified Data.Text.IO as T (readFile)
+import           Interpreter  (tryExecute)
 
 main :: IO ()
 main = do
-    -- filePath <- getLine
-    let filePath = "sample/test.sy"
+    filePath <- getLine
     code <- T.readFile filePath
-    print $ runParser sourceFileParser "" code
+    maybeErr <- tryExecute code
+    case maybeErr of
+        Left e -> print e
+        _      -> return ()

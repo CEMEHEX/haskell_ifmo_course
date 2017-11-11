@@ -2,46 +2,62 @@
 
 module Language.Construction
     (
-      Statement (..)
-    , Program
-    , runProgram
+      runProgram
     ) where
 
-import           Control.Monad.State.Strict (get, lift)
+import           Control.Monad.Except       (Except, ExceptT)
+import           Control.Monad.State.Strict (StateT, get, lift)
+import           Data.Text.IO               as T (getLine)
 
-import           Language.Expression        (Expr, getResult)
-import           Language.MutableVar        (Command (..), create, delete,
-                                             update)
-import           Language.Utils             (VarName)
+import           Language.Expression        (getResult)
+import           Language.MutableVar        (create, delete, update)
+import           Language.Utils             (Command (..), Expr, IOAction (..),
+                                             NameToVal, Program, RuntimeError,
+                                             Statement (..), VarName, except,
+                                             mkIOAction, wrapParserOutput)
 
-type Program a = [Statement a]
+import           Parsing.ExprParser         (exprParser)
+import           Text.Megaparsec            (runParser)
 
-data Statement a
-    = New VarName (Expr a)
-    | Upd VarName (Expr a)
-    | Out (Expr a)
-    | In VarName
-    | For VarName a a (Program a)
-    deriving (Show, Eq)
+runProgram :: Program Integer -> IOAction Integer ()
+runProgram program = IOAction $ mapM_ (runIOAction . runStatement) program
 
-runProgram :: Program Integer -> Command Integer
-runProgram program = Command $ mapM_ (runCmd . runStatement) program
-
-runStatement :: Statement Integer -> Command Integer
-runStatement (New name expr) = Command $ do
+runStatement :: Statement Integer -> IOAction Integer ()
+runStatement (New name expr) = mkIOAction . Command $ do
     m <- get
-    result <- lift $ getResult expr m
+    result <- lift . except $ getResult expr m
     runCmd $ create name result
-runStatement (Upd name expr) = Command $ do
+runStatement (Upd name expr) = mkIOAction . Command $ do
     m <- get
-    result <- lift $ getResult expr m
+    result <- lift . except $ getResult expr m
     runCmd $ update name result
-runStatement (Out _) = undefined -- TODO
-runStatement (In _)  = undefined -- TODO
-runStatement (For name begin end program) = Command $ do
-    let mkIteration i = Command $ do {
-        runCmd $ create name i;
-        runCmd $ runProgram program;
+runStatement (Out expr) = IOAction $ do
+    result <- runIOAction . calculate $ expr
+    lift . lift $ print result
+runStatement (In name)  = IOAction $ do
+    value <- lift . lift $ T.getLine
+    expr <- runIOAction . parseInput $ value
+    result <- runIOAction . calculate $ expr
+    addIO . runCmd $ update name result
+runStatement (For name begin end program) = IOAction $ do
+    runIOAction . mkIOAction $ create name begin
+    let mkIteration i = IOAction $ do {
+        runIOAction . mkIOAction $ update name i;
+        runIOAction $ runProgram program;
     }
-    mapM_ (runCmd . mkIteration) [begin..end]
-    runCmd $ delete name
+    mapM_ (runIOAction . mkIteration) [begin..end]
+    runIOAction . mkIOAction $ delete name
+
+calculate :: Expr Integer -> IOAction Integer Integer
+calculate expr = IOAction $ do
+    m <- get
+    addIO . lift . except $ getResult expr m
+
+parseInput :: VarName -> IOAction Integer (Expr Integer)
+parseInput input = IOAction $
+    addIO . lift . except . wrapParserOutput $ runParser exprParser "" input
+
+-- like mkIOAction, but for internal part of Command
+addIO :: StateT (NameToVal a) (Except RuntimeError) b
+      -> StateT (NameToVal a) (ExceptT RuntimeError IO) b
+addIO = runIOAction . mkIOAction . Command

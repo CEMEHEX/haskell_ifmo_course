@@ -18,7 +18,8 @@ tested-with:         GHC == 8.0.1
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Language.Expression
+  exposed-modules:     Interpreter
+                     , Language.Expression
                      , Language.MutableVar
                      , Language.Utils
                      , Language.Construction
