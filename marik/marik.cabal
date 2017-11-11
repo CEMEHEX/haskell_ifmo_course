@@ -1,4 +1,4 @@
-name:                hw3
+name:                marik
 version:             0.1.0.0
 synopsis:            Synopsis for task 3
 description:         Task 3 for FP ITMO course
@@ -34,22 +34,22 @@ library
                      , text
   default-language:    Haskell2010
 
-executable hw3
+executable marik
   hs-source-dirs:      app
   main-is:             Main.hs
   ghc-options:         -Wall -Werror -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
-                     , hw3
+                     , marik
                      , text
                      , megaparsec
   default-language:    Haskell2010
 
-test-suite hw3-test
+test-suite marik-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
   build-depends:       base
-                     , hw3
+                     , marik
                      , hspec
   ghc-options:         -Werror -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010

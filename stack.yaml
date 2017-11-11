@@ -3,7 +3,7 @@ extra-package-dbs: []
 packages:
 - hw1
 - hw2
-- hw3
+- marik
 - bonus
 extra-deps:
 - megaparsec-6.2.0

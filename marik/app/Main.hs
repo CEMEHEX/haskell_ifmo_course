@@ -15,4 +15,4 @@ main = do
         else TIO.readFile (head args) >>= run
 
 usage :: T.Text
-usage = "USAGE: hw3 <path to program>"
+usage = "USAGE: marik <path to program>"
