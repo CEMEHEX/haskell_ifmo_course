@@ -4,6 +4,7 @@ module Language.MutableVar
     , getVars
     , create
     , update
+    , delete
     ) where
 
 import           Control.Monad.State.Strict
@@ -32,3 +33,6 @@ update name value = Command $ do
     case m of
         Nothing -> lift . Left . VarNotInScope $ name
         _       -> modify $ Map.insert name value
+
+delete :: VarName -> Command a
+delete = Command . modify . Map.delete

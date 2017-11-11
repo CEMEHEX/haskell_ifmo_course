@@ -3,6 +3,7 @@
 module Parsing.Utils
     (
       Parser
+      , codeBlock
       , identifier
       , integer
       , parens
@@ -39,6 +40,9 @@ symbol = L.symbol spaceConsumer
 parens :: Parser a -> Parser a
 parens = between (symbol "(") (symbol ")")
 
+codeBlock :: Parser a -> Parser a
+codeBlock = between (symbol "{") (symbol "}")
+
 integer :: Parser Integer
 integer = lexeme L.decimal
 
@@ -46,7 +50,7 @@ rword :: Text -> Parser ()
 rword w = lexeme (string w *> notFollowedBy alphaNumChar)
 
 rws :: [Text] -- list of reserved words
-rws = ["let", "in", "mut"]
+rws = ["let", "in", "mut", "for"]
 
 identifier :: Parser Text
 identifier = (lexeme . try) (p >>= check)

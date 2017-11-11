@@ -2,7 +2,7 @@
 
 module Parsing.ConstructionsParser
     (
-      programParser
+      sourceFileParser
     ) where
 
 import           Control.Applicative   ((<|>))
@@ -10,9 +10,10 @@ import           Control.Applicative   ((<|>))
 import           Language.Construction (Program, Statement (..))
 
 import           Parsing.ExprParser    (exprParser)
-import           Parsing.Utils         (Parser, identifier, rword, symbol)
+import           Parsing.Utils         (Parser, codeBlock, identifier, integer,
+                                        rword, spaceConsumer, symbol)
 
-import           Text.Megaparsec       (many)
+import           Text.Megaparsec       (between, eof, many)
 
 
 varDeclParser :: Parser (Statement Integer)
@@ -26,8 +27,17 @@ inParser = In <$ symbol ">" <*> identifier
 outParser :: Parser (Statement Integer)
 outParser = Out <$ symbol "<" <*> exprParser
 
+forParser :: Parser (Statement Integer)
+forParser =
+    For <$ rword "for" <*> identifier <* rword "in" <*>
+    integer <* symbol ".." <*>
+    integer <*> codeBlock programParser
+
 statementParser :: Parser (Statement Integer)
-statementParser =  varDeclParser <|> inParser <|> outParser
+statementParser =  varDeclParser <|> inParser <|> outParser <|> forParser
 
 programParser :: Parser (Program Integer)
 programParser = many statementParser
+
+sourceFileParser :: Parser (Program Integer)
+sourceFileParser = between spaceConsumer eof programParser

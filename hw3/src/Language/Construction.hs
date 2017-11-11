@@ -10,10 +10,9 @@ module Language.Construction
 import           Control.Monad.State.Strict (get, lift)
 
 import           Language.Expression        (Expr, getResult)
-import           Language.MutableVar        (Command (..), create, update)
+import           Language.MutableVar        (Command (..), create, delete,
+                                             update)
 import           Language.Utils             (VarName)
-
--- TODO rename all this ugly shit
 
 type Program a = [Statement a]
 
@@ -45,7 +44,4 @@ runStatement (For name begin end program) = Command $ do
         runCmd $ runProgram program;
     }
     mapM_ (runCmd . mkIteration) [begin..end]
-
-
--- runOut :: Out (Expr Integer) -> StateT (NameToVal a) (Either Error) ()
--- runOut = undefined
+    runCmd $ delete name
