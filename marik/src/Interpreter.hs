@@ -1,33 +1,62 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Interpreter
     (
       run
+    , startInteractive
     ) where
 
-import           Control.Monad.Except        (ExceptT, runExceptT)
-import           Control.Monad.State.Strict  (evalStateT)
+import           Control.Monad               (void)
+import           Control.Monad.Except        (runExceptT)
+import           Control.Monad.State.Strict  (execStateT)
 
-import           Data.Map.Strict             as Map (empty)
-import           Data.Text                   as T (Text)
+import qualified Data.Map.Strict             as Map (empty)
+import qualified Data.Text                   as T (Text)
+import qualified Data.Text.IO                as TIO (getLine, putStr, putStrLn)
+
+import           System.IO                   (hFlush, stdout)
 
 import           Parsing.ConstructionsParser (sourceFileParser)
 
 import           Text.Megaparsec             (runParser)
 
 import           Language.Construction       (runProgram)
-import           Language.Utils              (RuntimeError, except, mkExceptIO,
-                                              runIOAction, wrapParserOutput)
+import           Language.Utils              (NameToVal, RuntimeError, except,
+                                              mkExceptIO, runIOAction,
+                                              wrapParserOutput)
 
-run :: T.Text -> IO ()
-run code = do
-    maybeErr <- tryExecute code
-    case maybeErr of
-        Left e -> print e
-        _      -> return ()
+type Code = T.Text
 
-tryExecute :: T.Text -> IO (Either RuntimeError ())
-tryExecute = runExceptT . interpretFile
+startInteractive :: IO ()
+startInteractive = interactiveStep Map.empty
 
-interpretFile :: T.Text -> ExceptT RuntimeError IO ()
-interpretFile code = do
+interactiveStep :: NameToVal Integer -> IO ()
+interactiveStep m = do
+    cmd <- prompt "meow:3 "
+    if cmd == ":q"
+        then TIO.putStrLn "purr... purr..."
+        else runWithState m cmd >>= interactiveStep
+
+prompt :: T.Text -> IO Code
+prompt text = do
+    TIO.putStr text
+    hFlush stdout
+    TIO.getLine
+
+run :: Code -> IO ()
+run = void . runWithState Map.empty
+
+runWithState :: NameToVal Integer -> Code -> IO (NameToVal Integer)
+runWithState m code = do
+    resOrErr <- tryInterpret m code
+    case resOrErr of
+        Left e   -> print e >> return m
+        Right m' -> return m'
+
+
+tryInterpret :: NameToVal Integer
+             -> Code
+             -> IO (Either RuntimeError (NameToVal Integer))
+tryInterpret m code = runExceptT $ do
     program <- mkExceptIO . except . wrapParserOutput $ runParser sourceFileParser "" code
-    (evalStateT . runIOAction . runProgram) program empty
+    (execStateT . runIOAction . runProgram) program m

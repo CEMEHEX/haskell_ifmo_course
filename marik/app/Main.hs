@@ -4,15 +4,16 @@ module Main where
 
 import qualified Data.Text          as T (Text)
 import qualified Data.Text.IO       as TIO (putStrLn, readFile)
-import           Interpreter        (run)
+import           Interpreter        (run, startInteractive)
 import           System.Environment (getArgs)
 
 main :: IO ()
 main = do
     args <- getArgs
-    if length args /= 1
-        then TIO.putStrLn usage
-        else TIO.readFile (head args) >>= run
+    case length args of
+        0 -> startInteractive
+        1 -> TIO.readFile (head args) >>= run
+        _ -> TIO.putStrLn usage
 
 usage :: T.Text
-usage = "USAGE: marik <path to program>"
+usage = "USAGE: marik [path to program]"

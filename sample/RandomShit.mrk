@@ -17,7 +17,7 @@ mut y = 86
 
 mut u = 0
 mut v = 0
-for i in (1 + 2 * (6 / 3))..y {
+for i in 1 + 2 * (6 / 3)..y - 1 * 2 {
     v = i
     u = v + 30
     < u
