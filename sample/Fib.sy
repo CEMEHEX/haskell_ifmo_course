@@ -1,0 +1,15 @@
+// Fibonacci numbers
+mut a = 0
+mut b = 1
+mut n = 0
+
+> n
+
+mut t = 0
+for i in 1..n {
+    t = a
+    a = b
+    b = t + b
+}
+
+< a

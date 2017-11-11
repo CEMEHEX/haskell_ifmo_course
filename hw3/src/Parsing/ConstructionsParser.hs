@@ -10,8 +10,8 @@ import           Control.Applicative ((<|>))
 import           Language.Utils      (Program, Statement (..))
 
 import           Parsing.ExprParser  (exprParser)
-import           Parsing.Utils       (Parser, codeBlock, identifier, integer,
-                                      rword, spaceConsumer, symbol)
+import           Parsing.Utils       (Parser, codeBlock, identifier, rword,
+                                      spaceConsumer, symbol)
 
 import           Text.Megaparsec     (between, eof, many)
 
@@ -30,8 +30,8 @@ outParser = Out <$ symbol "<" <*> exprParser
 forParser :: Parser (Statement Integer)
 forParser =
     For <$ rword "for" <*> identifier <* rword "in" <*>
-    integer <* symbol ".." <*>
-    integer <*> codeBlock programParser
+    exprParser <* symbol ".." <*>
+    exprParser <*> codeBlock programParser
 
 statementParser :: Parser (Statement Integer)
 statementParser =  varDeclParser <|> inParser <|> outParser <|> forParser

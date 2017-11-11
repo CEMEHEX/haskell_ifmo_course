@@ -1,0 +1,7 @@
+// Numbers from n to 1
+mut n = 0
+> n
+
+for i in n..1 {
+    < i
+}

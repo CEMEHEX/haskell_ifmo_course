@@ -56,7 +56,7 @@ data Statement a
    | Upd VarName (Expr a)
    | Out (Expr a)
    | In VarName
-   | For VarName a a (Program a)
+   | For VarName (Expr a) (Expr a) (Program a)
    deriving (Show, Eq)
 
 wrapParserOutput :: Either (ParseError (Token Text) Void) a

@@ -39,13 +39,18 @@ runStatement (In name)  = IOAction $ do
     expr <- runIOAction . parseInput $ value
     result <- runIOAction . calculate $ expr
     addIO . runCmd $ update name result
-runStatement (For name begin end program) = IOAction $ do
+runStatement (For name beginExpr endExpr program) = IOAction $ do
+    begin <- runIOAction . calculate $ beginExpr
+    end <- runIOAction . calculate $ endExpr
+
     runIOAction . mkIOAction $ create name begin
+
     let mkIteration i = IOAction $ do {
         runIOAction . mkIOAction $ update name i;
         runIOAction $ runProgram program;
     }
-    mapM_ (runIOAction . mkIteration) [begin..end]
+    mapM_ (runIOAction . mkIteration) $ range begin end
+
     runIOAction . mkIOAction $ delete name
 
 calculate :: Expr Integer -> IOAction Integer Integer
@@ -61,3 +66,8 @@ parseInput input = IOAction $
 addIO :: StateT (NameToVal a) (Except RuntimeError) b
       -> StateT (NameToVal a) (ExceptT RuntimeError IO) b
 addIO = runIOAction . mkIOAction . Command
+
+range :: (Ord a, Enum a) => a -> a -> [a]
+range begin end = if begin <= end
+    then [begin..end]
+    else [begin, pred begin..end]
