@@ -20,7 +20,7 @@ import           Parsing.ConstructionsParser (sourceFileParser)
 
 import           Text.Megaparsec             (runParser)
 
-import           Language.Construction       (runProgram)
+import           Language.Core               (runProgram)
 import           Language.Utils              (Code, NameToVal, RuntimeError,
                                               except, mkExceptIO, runIOAction,
                                               wrapParserOutput)

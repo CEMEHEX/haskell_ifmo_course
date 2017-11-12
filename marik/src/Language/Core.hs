@@ -1,6 +1,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 
-module Language.Construction
+module Language.Core
     (
       runProgram
     ) where

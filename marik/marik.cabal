@@ -22,7 +22,7 @@ library
                      , Language.Expression
                      , Language.MutableVar
                      , Language.Utils
-                     , Language.Construction
+                     , Language.Core
                      , Parsing.ExprParser
                      , Parsing.Utils
                      , Parsing.ConstructionsParser

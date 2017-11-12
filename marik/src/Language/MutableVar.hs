@@ -7,28 +7,24 @@ module Language.MutableVar
     ) where
 
 import           Control.Monad.State.Strict (gets, lift, modify)
-
 import qualified Data.Map.Strict            as Map (delete, insert, lookup)
+import           Data.Maybe                 (maybe)
+
 import           Language.Utils             (Command (..), RuntimeError (AlreadyExists, VarNotInScope),
                                              VarName, except)
 
 
-
-
--- TODO replace case of construction with maybe
 create :: VarName -> a -> Command a ()
 create name value = Command $ do
     m <- gets $ Map.lookup name
-    case m of
-        Nothing -> modify $ Map.insert name value
-        _       -> lift . except . Left . AlreadyExists $ name
+    maybe (modify $ Map.insert name value)
+        (const . lift . except . Left . AlreadyExists $ name) m
 
 update :: VarName -> a -> Command a ()
 update name value = Command $ do
     m <- gets $ Map.lookup name
-    case m of
-        Nothing -> lift . except . Left . VarNotInScope $ name
-        _       -> modify $ Map.insert name value
+    maybe (lift . except . Left . VarNotInScope $ name)
+        (const . modify $ Map.insert name value) m
 
 delete :: VarName -> Command a ()
 delete = Command . modify . Map.delete
