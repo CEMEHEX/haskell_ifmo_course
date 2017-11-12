@@ -1,27 +1,28 @@
 module Language.Utils
     (
-      Command (..)
-    , Code
+      Code
+    , Command (..)
     , Expr(..)
     , IOAction (..)
+    , NameToVal
     , Program
     , VarName
-    , NameToVal
     , RuntimeError(..)
     , Statement (..)
     , except
-    , mkIOAction
     , mkExceptIO
+    , mkIOAction
     , wrapParserOutput
     ) where
 
 import           Data.Functor.Identity      (runIdentity)
 import qualified Data.Map.Strict            as Map (Map)
 import           Data.Text                  as T (Text, unpack)
+import           Data.Void                  (Void)
 
 import           Control.Monad.Except       (Except, ExceptT (..), runExceptT)
 import           Control.Monad.State.Strict (StateT (..), runStateT)
-import           Data.Void                  (Void)
+
 import           Text.Megaparsec.Error      (ParseError, parseErrorPretty)
 import           Text.Megaparsec.Stream     (Token)
 

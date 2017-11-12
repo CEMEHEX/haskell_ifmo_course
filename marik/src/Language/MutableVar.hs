@@ -2,8 +2,8 @@ module Language.MutableVar
     (
       Command (..)
     , create
-    , update
     , delete
+    , update
     ) where
 
 import           Control.Monad.State.Strict (gets, lift, modify)

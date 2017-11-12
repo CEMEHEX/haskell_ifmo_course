@@ -6,6 +6,7 @@ module Parsing.ConstructionsParser
     ) where
 
 import           Control.Applicative ((<|>))
+import           Text.Megaparsec     (between, eof, many)
 
 import           Language.Utils      (Program, Statement (..))
 
@@ -13,7 +14,6 @@ import           Parsing.ExprParser  (exprParser)
 import           Parsing.Utils       (Parser, codeBlock, identifier, rword,
                                       spaceConsumer, symbol)
 
-import           Text.Megaparsec     (between, eof, many)
 
 
 varDeclParser :: Parser (Statement Integer)

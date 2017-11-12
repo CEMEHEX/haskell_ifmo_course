@@ -14,6 +14,7 @@ module Parsing.Utils
 
 import           Data.Text                  (Text, cons, pack)
 import           Data.Void                  (Void)
+
 import           Text.Megaparsec            (Parsec, between, many,
                                              notFollowedBy, try)
 import           Text.Megaparsec.Char       (alphaNumChar, letterChar, space1,

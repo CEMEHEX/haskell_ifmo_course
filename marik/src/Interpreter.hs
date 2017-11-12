@@ -16,9 +16,9 @@ import qualified Data.Text.IO                as TIO (getLine, putStr, putStrLn)
 
 import           System.IO                   (hFlush, stdout)
 
-import           Parsing.ConstructionsParser (sourceFileParser)
-
 import           Text.Megaparsec             (runParser)
+
+import           Parsing.ConstructionsParser (sourceFileParser)
 
 import           Language.Core               (runProgram)
 import           Language.Utils              (Code, NameToVal, RuntimeError,

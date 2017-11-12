@@ -8,6 +8,7 @@ import           Control.Applicative  (ZipList (ZipList))
 import           Control.Monad.Reader (ReaderT, ask, lift, local, runReaderT,
                                        when)
 import qualified Data.Map.Strict      as Map (insert, lookup)
+
 import           Language.Utils       (Expr (..), NameToVal,
                                        RuntimeError (DivByZero, VarNotInScope))
 

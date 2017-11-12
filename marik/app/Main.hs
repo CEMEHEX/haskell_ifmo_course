@@ -1,11 +1,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Main where
+module Main
+    (
+      main
+    ) where
 
 import qualified Data.Text          as T (Text)
 import qualified Data.Text.IO       as TIO (putStrLn, readFile)
-import           Interpreter        (run, startInteractive)
+
 import           System.Environment (getArgs)
+
+import           Interpreter        (run, startInteractive)
 
 main :: IO ()
 main = do

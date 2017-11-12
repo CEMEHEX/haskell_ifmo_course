@@ -8,6 +8,7 @@ module Language.Core
 import           Control.Monad.Except       (Except, ExceptT)
 import           Control.Monad.State.Strict (StateT, get, lift)
 import           Data.Text.IO               as T (getLine)
+import           Text.Megaparsec            (runParser)
 
 import           Language.Expression        (getResult)
 import           Language.MutableVar        (create, delete, update)
@@ -18,7 +19,7 @@ import           Language.Utils             (Code, Command (..), Expr,
                                              wrapParserOutput)
 
 import           Parsing.ExprParser         (exprParser)
-import           Text.Megaparsec            (runParser)
+
 -- TODO improve error messages
 runProgram :: Program Integer -> IOAction Integer ()
 runProgram program = IOAction $ mapM_ (runIOAction . runStatement) program
