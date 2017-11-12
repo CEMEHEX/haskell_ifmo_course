@@ -23,7 +23,7 @@ import           Parsing.ConstructionsParser (sourceFileParser)
 
 import           Language.Core               (runProgram)
 import           Language.Utils              (Code, NameToVal, RuntimeError,
-                                              except, mkExceptIO, runIOAction,
+                                              mkExceptIO, runIOAction,
                                               wrapParserOutput)
 
 startInteractive :: IO ()
@@ -54,5 +54,5 @@ tryInterpret :: NameToVal Integer
              -> Code
              -> IO (Either RuntimeError (NameToVal Integer))
 tryInterpret m code = runExceptT $ do
-    program <- mkExceptIO . except . wrapParserOutput $ runParser sourceFileParser "" code
+    program <- mkExceptIO . wrapParserOutput $ runParser sourceFileParser "" code
     (execStateT . runIOAction . runProgram) program m

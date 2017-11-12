@@ -15,8 +15,7 @@ import           Language.MutableVar        (create, delete, update)
 import           Language.Utils             (Code, Command (..), Expr,
                                              IOAction (..), NameToVal, Program,
                                              RuntimeError, Statement (..),
-                                             except, mkIOAction,
-                                             wrapParserOutput)
+                                             mkIOAction, wrapParserOutput)
 
 import           Parsing.ExprParser         (exprParser)
 
@@ -59,11 +58,11 @@ calculateIO = mkIOAction . calculate
 calculate :: Expr Integer -> Command Integer Integer
 calculate expr = Command $ do
     m <- get
-    lift . except $ getResult expr m
+    lift $ getResult expr m
 
 parseInput :: Code -> IOAction Integer (Expr Integer)
 parseInput input = IOAction $
-    addIO . lift . except . wrapParserOutput $ runParser exprParser "" input
+    addIO . lift . wrapParserOutput $ runParser exprParser "" input
 
 -- like mkIOAction, but for internal part of Command
 addIO :: StateT (NameToVal a) (Except RuntimeError) b

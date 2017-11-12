@@ -5,8 +5,10 @@ module Language.Expression
     ) where
 
 import           Control.Applicative  (ZipList (ZipList))
+import           Control.Monad.Except (Except, throwError)
 import           Control.Monad.Reader (ReaderT, ask, lift, local, runReaderT,
                                        when)
+
 import qualified Data.Map.Strict      as Map (insert, lookup)
 import           Data.Maybe           (maybe)
 
@@ -14,7 +16,7 @@ import           Language.Utils       (Expr (..), NameToVal,
                                        RuntimeError (DivByZero, VarNotInScope))
 
 type BinOp a = a -> a -> a
-type ErrorCheckers a e = [a -> a -> Either e ()]
+type ErrorCheckers a e = [a -> a -> Except e ()]
 type SafeWrapper a e = BinOp a
                     -> Expr a
                     -> Expr a
@@ -22,16 +24,16 @@ type SafeWrapper a e = BinOp a
                     -> ExprEvaluation a
 
 newtype ExprEvaluation a = ExprEvaluation
-    { runEvaluation :: ReaderT (NameToVal a) (Either RuntimeError) a }
+    { runEvaluation :: ReaderT (NameToVal a) (Except RuntimeError) a }
 
-getResult :: (Integral a) => Expr a -> NameToVal a -> Either RuntimeError a
+getResult :: (Integral a) => Expr a -> NameToVal a -> Except RuntimeError a
 getResult = runReaderT . runEvaluation . eval
 
 eval :: (Integral a) => Expr a -> ExprEvaluation a
 eval (Lit x)        = ExprEvaluation $ return x
 eval (Var x)        = ExprEvaluation $ do
     m <- ask
-    maybe (lift . Left . VarNotInScope $ x)
+    maybe (throwError $ VarNotInScope x)
         return (Map.lookup x m)
 eval (Add x y)      = wrapSafe (+) x y noCheckers
 eval (Sub x y)      = wrapSafe (-) x y noCheckers
@@ -48,11 +50,11 @@ wrapSafe op x y checkers = ExprEvaluation $ do
     lift $ runCheckers xVal yVal checkers
     return $ xVal `op` yVal
 
-runCheckers :: a -> a -> ErrorCheckers a e -> Either e ()
+runCheckers :: a -> a -> ErrorCheckers a e -> Except e ()
 runCheckers a b checkers = sequence_ $ ZipList checkers <*> pure a <*> pure b
 
 noCheckers :: ErrorCheckers a e
 noCheckers = []
 
 divCheckers :: (Num a, Eq a) => ErrorCheckers a RuntimeError
-divCheckers = [\_ b -> when (b == 0) $ Left DivByZero]
+divCheckers = [\_ b -> when (b == 0) $ throwError DivByZero]

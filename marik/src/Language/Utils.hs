@@ -9,7 +9,6 @@ module Language.Utils
     , VarName
     , RuntimeError(..)
     , Statement (..)
-    , except
     , mkExceptIO
     , mkIOAction
     , wrapParserOutput
@@ -64,18 +63,15 @@ data Statement a
    deriving (Show, Eq)
 
 wrapParserOutput :: Either (ParseError (Token Text) Void) a
-                 -> Either RuntimeError a
-wrapParserOutput (Right a) = Right a
-wrapParserOutput (Left e)  = Left . NoParse . parseErrorPretty $ e
+                 -> Except RuntimeError a
+wrapParserOutput (Right a) = return a
+wrapParserOutput (Left e)  = ExceptT . return . Left . NoParse . parseErrorPretty $ e
 
 mkExceptIO :: Except e a -> ExceptT e IO a
 mkExceptIO = ExceptT . return . runIdentity . runExceptT
 
 mkIOAction :: Command a b -> IOAction a b
 mkIOAction cmd = IOAction . StateT $ \s -> mkExceptIO ((runStateT . runCmd) cmd s)
-
-except :: Either e a -> Except e a
-except  = ExceptT . return
 
 instance Show RuntimeError where
     show DivByZero            = "Runtime error: division by zero"
