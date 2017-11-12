@@ -1,11 +1,12 @@
 module Language.Utils
     (
       Command (..)
+    , Code
+    , Expr(..)
     , IOAction (..)
     , Program
     , VarName
     , NameToVal
-    , Expr(..)
     , RuntimeError(..)
     , Statement (..)
     , except
@@ -25,6 +26,7 @@ import           Text.Megaparsec.Error      (ParseError, parseErrorPretty)
 import           Text.Megaparsec.Stream     (Token)
 
 type VarName = T.Text
+type Code = T.Text
 type NameToVal a = Map.Map VarName a
 
 data Expr a

@@ -11,10 +11,11 @@ import           Data.Text.IO               as T (getLine)
 
 import           Language.Expression        (getResult)
 import           Language.MutableVar        (create, delete, update)
-import           Language.Utils             (Command (..), Expr, IOAction (..),
-                                             NameToVal, Program, RuntimeError,
-                                             Statement (..), VarName, except,
-                                             mkIOAction, wrapParserOutput)
+import           Language.Utils             (Code, Command (..), Expr,
+                                             IOAction (..), NameToVal, Program,
+                                             RuntimeError, Statement (..),
+                                             except, mkIOAction,
+                                             wrapParserOutput)
 
 import           Parsing.ExprParser         (exprParser)
 import           Text.Megaparsec            (runParser)
@@ -24,24 +25,22 @@ runProgram program = IOAction $ mapM_ (runIOAction . runStatement) program
 
 runStatement :: Statement Integer -> IOAction Integer ()
 runStatement (New name expr) = mkIOAction . Command $ do
-    m <- get
-    result <- lift . except $ getResult expr m
+    result <- runCmd . calculate $ expr
     runCmd $ create name result
 runStatement (Upd name expr) = mkIOAction . Command $ do
-    m <- get
-    result <- lift . except $ getResult expr m
+    result <- runCmd . calculate $ expr
     runCmd $ update name result
 runStatement (Out expr) = IOAction $ do
-    result <- runIOAction . calculate $ expr
+    result <- runIOAction . calculateIO $ expr
     lift . lift $ print result
 runStatement (In name)  = IOAction $ do
     value <- lift . lift $ T.getLine
     expr <- runIOAction . parseInput $ value
-    result <- runIOAction . calculate $ expr
+    result <- runIOAction . calculateIO $ expr
     addIO . runCmd $ update name result
 runStatement (For name beginExpr endExpr program) = IOAction $ do
-    begin <- runIOAction . calculate $ beginExpr
-    end <- runIOAction . calculate $ endExpr
+    begin <- runIOAction . calculateIO $ beginExpr
+    end <- runIOAction . calculateIO $ endExpr
 
     runIOAction . mkIOAction $ create name begin
 
@@ -53,12 +52,15 @@ runStatement (For name beginExpr endExpr program) = IOAction $ do
 
     runIOAction . mkIOAction $ delete name
 
-calculate :: Expr Integer -> IOAction Integer Integer
-calculate expr = IOAction $ do
-    m <- get
-    addIO . lift . except $ getResult expr m
+calculateIO :: Expr Integer -> IOAction Integer Integer
+calculateIO = mkIOAction . calculate
 
-parseInput :: VarName -> IOAction Integer (Expr Integer)
+calculate :: Expr Integer -> Command Integer Integer
+calculate expr = Command $ do
+    m <- get
+    lift . except $ getResult expr m
+
+parseInput :: Code -> IOAction Integer (Expr Integer)
 parseInput input = IOAction $
     addIO . lift . except . wrapParserOutput $ runParser exprParser "" input
 

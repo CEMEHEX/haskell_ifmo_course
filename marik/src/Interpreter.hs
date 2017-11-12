@@ -21,11 +21,9 @@ import           Parsing.ConstructionsParser (sourceFileParser)
 import           Text.Megaparsec             (runParser)
 
 import           Language.Construction       (runProgram)
-import           Language.Utils              (NameToVal, RuntimeError, except,
-                                              mkExceptIO, runIOAction,
+import           Language.Utils              (Code, NameToVal, RuntimeError,
+                                              except, mkExceptIO, runIOAction,
                                               wrapParserOutput)
-
-type Code = T.Text
 
 startInteractive :: IO ()
 startInteractive = interactiveStep Map.empty
