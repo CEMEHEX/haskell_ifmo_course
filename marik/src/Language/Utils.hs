@@ -27,14 +27,15 @@ import           Text.Megaparsec.Stream     (Token)
 type VarName = T.Text
 type NameToVal a = Map.Map VarName a
 
-data Expr a = Lit a
-          | Var VarName
-          | Add (Expr a) (Expr a)
-          | Sub (Expr a) (Expr a)
-          | Mul (Expr a) (Expr a)
-          | Div (Expr a) (Expr a)
-          | Let VarName (Expr a) (Expr a)
-          deriving (Show, Eq)
+data Expr a
+    = Lit a
+    | Var VarName
+    | Add (Expr a) (Expr a)
+    | Sub (Expr a) (Expr a)
+    | Mul (Expr a) (Expr a)
+    | Div (Expr a) (Expr a)
+    | Let VarName (Expr a) (Expr a)
+    deriving (Eq)
 
 data RuntimeError
     = DivByZero
@@ -78,3 +79,23 @@ instance Show RuntimeError where
     show (VarNotInScope name) = "Variable not in scope: " ++ T.unpack name
     show (AlreadyExists name) = "Variable already exists: " ++ T.unpack name
     show (NoParse msg)        = msg
+
+instance (Show a) => Show (Expr a) where
+    show (Lit a)    = show a
+    show (Var name) = T.unpack name
+    show (Add x y)  = showOp "+" x y
+    show (Sub x y)  = showOp "-" x y
+    show (Mul x y)  = showOp "*" x y
+    show (Div x y)  = showOp "/" x y
+    show (Let name x y) =
+        "(let " ++ T.unpack name ++ " = " ++ show x ++ " in " ++ show y ++ ")"
+
+
+wrapExpr :: (Show a) => Expr a -> String
+wrapExpr expr@(Lit _)   = show expr
+wrapExpr expr@(Var _)   = show expr
+wrapExpr expr@(Mul _ _) = show expr
+wrapExpr expr           = "(" ++ show expr ++ ")"
+
+showOp :: (Show a) => String -> Expr a -> Expr a -> String
+showOp op x y = wrapExpr x ++ " " ++ op ++ " " ++ wrapExpr y

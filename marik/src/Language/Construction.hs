@@ -18,7 +18,7 @@ import           Language.Utils             (Command (..), Expr, IOAction (..),
 
 import           Parsing.ExprParser         (exprParser)
 import           Text.Megaparsec            (runParser)
-
+-- TODO improve error messages
 runProgram :: Program Integer -> IOAction Integer ()
 runProgram program = IOAction $ mapM_ (runIOAction . runStatement) program
 
