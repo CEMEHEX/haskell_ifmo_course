@@ -16,7 +16,7 @@ module Language.Utils
 
 import           Data.Functor.Identity      (runIdentity)
 import qualified Data.Map.Strict            as Map (Map)
-import           Data.Text                  as T (Text)
+import           Data.Text                  as T (Text, unpack)
 
 import           Control.Monad.Except       (Except, ExceptT (..), runExceptT)
 import           Control.Monad.State.Strict (StateT (..), runStateT)
@@ -41,7 +41,7 @@ data RuntimeError
     | VarNotInScope VarName
     | AlreadyExists VarName
     | NoParse String
-    deriving (Show, Eq)
+    deriving (Eq)
 
 newtype Command a b =
     Command { runCmd :: StateT (NameToVal a) (Except RuntimeError) b }
@@ -72,3 +72,9 @@ mkIOAction cmd = IOAction . StateT $ \s -> mkExceptIO ((runStateT . runCmd) cmd 
 
 except :: Either e a -> Except e a
 except  = ExceptT . return
+
+instance Show RuntimeError where
+    show DivByZero            = "Runtime error: division by zero"
+    show (VarNotInScope name) = "Variable not in scope: " ++ T.unpack name
+    show (AlreadyExists name) = "Variable already exists: " ++ T.unpack name
+    show (NoParse msg)        = msg
