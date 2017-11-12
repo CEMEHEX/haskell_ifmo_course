@@ -8,6 +8,7 @@ import           Control.Applicative  (ZipList (ZipList))
 import           Control.Monad.Reader (ReaderT, ask, lift, local, runReaderT,
                                        when)
 import qualified Data.Map.Strict      as Map (insert, lookup)
+import           Data.Maybe           (maybe)
 
 import           Language.Utils       (Expr (..), NameToVal,
                                        RuntimeError (DivByZero, VarNotInScope))
@@ -30,10 +31,8 @@ eval :: (Integral a) => Expr a -> ExprEvaluation a
 eval (Lit x)        = ExprEvaluation $ return x
 eval (Var x)        = ExprEvaluation $ do
     m <- ask
-    -- TODO replace dat shit with maybe
-    case Map.lookup x m of
-        Nothing  -> lift . Left . VarNotInScope $ x
-        Just val -> return val
+    maybe (lift . Left . VarNotInScope $ x)
+        return (Map.lookup x m)
 eval (Add x y)      = wrapSafe (+) x y noCheckers
 eval (Sub x y)      = wrapSafe (-) x y noCheckers
 eval (Mul x y)      = wrapSafe (*) x y noCheckers

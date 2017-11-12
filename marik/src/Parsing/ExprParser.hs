@@ -13,9 +13,6 @@ import           Parsing.Utils        (Parser, identifier, integer, parens,
                                        rword, symbol)
 
 
--- whileParser :: Parser Expr
--- whileParser = between spaceConsumer eof exprParser
-
 exprParser :: Parser (Expr Integer)
 exprParser = makeExprParser arithmTerm arithmOperators
 

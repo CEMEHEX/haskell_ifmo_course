@@ -10,6 +10,7 @@ import           Control.Monad               (void)
 import           Control.Monad.Except        (runExceptT)
 import           Control.Monad.State.Strict  (execStateT)
 
+import           Data.Either                 (either)
 import qualified Data.Map.Strict             as Map (empty)
 import qualified Data.Text                   as T (Text)
 import qualified Data.Text.IO                as TIO (getLine, putStr, putStrLn)
@@ -47,10 +48,7 @@ run = void . runWithState Map.empty
 runWithState :: NameToVal Integer -> Code -> IO (NameToVal Integer)
 runWithState m code = do
     resOrErr <- tryInterpret m code
-    case resOrErr of
-        Left e   -> print e >> return m
-        Right m' -> return m'
-
+    either (\e -> print e >> return m) return resOrErr
 
 tryInterpret :: NameToVal Integer
              -> Code
