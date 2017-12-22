@@ -4,6 +4,7 @@ packages:
 - hw1
 - hw2
 - marik
+- hw4
 - bonus
 extra-deps:
 - megaparsec-6.2.0
