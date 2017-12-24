@@ -19,10 +19,15 @@ tested-with:         GHC == 8.0.1
 library
   hs-source-dirs:      src
   exposed-modules:     TH.Tuple, TH.KosherShow, TH.ShowExample
+                     , MyLenses.BaseLens
+                     , Lenses.FileSystem
+                     , Comonad.Renew
   ghc-options:         -Wall
   build-depends:       base >= 4.9 && < 5
                      , template-haskell
                      , text
+                     , directory
+                     , comonad
   default-language:    Haskell2010
 
 executable hw4
@@ -37,6 +42,7 @@ test-suite hw4-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
+  other-modules:       MyLensSpec
   build-depends:       base
                      , hw4
                      , hspec

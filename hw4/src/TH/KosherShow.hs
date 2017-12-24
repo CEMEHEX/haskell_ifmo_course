@@ -29,13 +29,13 @@ genericShowClause name fields = do
     let constructorName = nameBase name
     (pats,vars) <- genPE (length fields)
 
-    let f' []       = [| T.pack constructorName |]
-        f' (v:vs) = [| $(f' vs) `T.append` T.pack " " `T.append` T.pack (show $v) |]
+    let genBody' []       = [| T.pack constructorName |]
+        genBody' (v:vs) = [| $(genBody' vs) `T.append` T.pack " " `T.append` T.pack (show $v) |]
 
-    let f = f' . reverse
+    let genBody = genBody' . reverse
 
     clause [conP name pats]
-           (normalB (f vars)) []
+           (normalB (genBody vars)) []
 
 showClause :: Con -> Q Clause
 showClause (NormalC name fields) = genericShowClause name fields
@@ -46,11 +46,11 @@ showClause other = error $ "Constructor " ++ show other ++ " is not supported"
 deriveKosherShow :: Name -> Q [Dec]
 deriveKosherShow t = do
     TyConI (DataD _ _ _ _ constructors _) <- reify t
-    showbody <- mapM showClause constructors
+    showBody <- mapM showClause constructors
 
     d <- [d| instance KosherShow T1 where
                 kosherShow _ = T.empty
            |]
 
     let    [InstanceD overlap typ (AppT showt (ConT _)) [FunD showf _]] = d
-    return [InstanceD overlap typ (AppT showt (ConT t  )) [FunD showf showbody]]
+    return [InstanceD overlap typ (AppT showt (ConT t  )) [FunD showf showBody]]

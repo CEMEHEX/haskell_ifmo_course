@@ -2,9 +2,9 @@
 
 module TH.ShowExample
     (
-      MyData(..)
-    , RecTest(..)
-    , InfixTest(..)
+      MyData (..)
+    , RecTest (..)
+    , InfixTest (..)
     ) where
 
 import           TH.KosherShow (deriveKosherShow)

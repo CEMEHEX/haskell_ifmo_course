@@ -12,7 +12,11 @@ projection :: Int
            -> Q Exp
 projection n tuple i = do
     x <- newName "x"
-    appE (lamE [tupP $ replicate (i - 1) wildP ++ [varP x] ++ replicate (n - i) wildP] (varE x)) tuple
+    appE
+        (lamE
+            [tupP $ replicate (i - 1) wildP ++ [varP x] ++ replicate (n - i) wildP]
+            (varE x))
+        tuple
 
 choseByIndices :: Int
                -> [Int]
